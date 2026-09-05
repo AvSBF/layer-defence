@@ -11,8 +11,13 @@
 [ext_resource type="Script" uid="uid://153y2wxf1x7d" path="res://Scripts/Spawners/spawn_point.gd" id="8_point"]
 [ext_resource type="Resource" uid="uid://c80d6t3lmspff" path="res://Resources/Spawners/wave_1.tres" id="8_ti1bm"]
 [ext_resource type="Resource" path="res://Resources/Spawners/wave_2.tres" id="9_op4cu"]
+[ext_resource type="Script" path="res://Scripts/Navigation/platform_graph.gd" id="10_graph"]
+[ext_resource type="Script" path="res://Scripts/Navigation/enemy_navigation.gd" id="11_nav"]
 
 [node name="Game" type="Node2D" unique_id=1272095099]
+
+[node name="PlatformGraph" type="Node" parent="." groups=["platform_graph"]]
+script = ExtResource("10_graph")
 
 [node name="Player" parent="." unique_id=1528174240 instance=ExtResource("1_5cjrv")]
 position = Vector2(0, 15)
@@ -160,12 +165,12 @@ script = ExtResource("5_p70al")
 
 [node name="Spawners" type="Node2D" parent="." unique_id=1361571916]
 
-[node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "regular_spawn_points")]
+[node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "spawn_points")]
 script = ExtResource("6_spawner")
 waves = Array[ExtResource("7_7yo87")]([ExtResource("8_ti1bm"), ExtResource("9_op4cu")])
 target = NodePath("../../Player")
 spawn_areas = [NodePath("../LeftArea"), NodePath("../RightArea")]
-regular_spawn_points = NodePath("../RegularSpawnPoints")
+spawn_points = [NodePath("../RegularSpawnPoints/SpawnPoint"), NodePath("../RegularSpawnPoints/SpawnPoint2"), NodePath("../RegularSpawnPoints/SpawnPoint3"), NodePath("../RegularSpawnPoints/SpawnPoint4"), NodePath("../RegularSpawnPoints/SpawnPoint5"), NodePath("../RegularSpawnPoints/SpawnPoint6"), NodePath("../RegularSpawnPoints/SpawnPoint7"), NodePath("../RegularSpawnPoints/SpawnPoint8")]
 
 [node name="LeftArea" type="Node2D" parent="Spawners" unique_id=65813441]
 script = ExtResource("7_area")

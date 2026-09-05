@@ -6,7 +6,6 @@ extends CharacterBody2D
 @onready var health_component : HealthComponent = $HealthComponent
 @onready var ability_component : AbilityComponent = $AbilityComponent
 @onready var state_machine : StateMachine = $StateMachine
-@onready var navigation_agent : NavigationAgent2D = $NavigationAgent2D
 
 var target : Node2D
 
@@ -14,12 +13,15 @@ func _ready() -> void:
 	if stats:
 		health_component.max_health = stats.max_hp
 		health_component.health = stats.max_hp
-		ability_component.setup(stats)
+
+func _setup_navigation() -> void:
+	var nav = get_node_or_null("EnemyNavigation")
+	if nav:
+		var graph = get_tree().get_first_node_in_group("platform_graph")
+		if graph:
+			nav.setup(graph, target)
 
 func _physics_process(delta : float) -> void:
-	if navigation_agent.is_navigation_finished():
-		return
-	var next_pos = navigation_agent.get_next_path_position()
-	var direction = (next_pos - global_position).normalized()
-	velocity = direction * stats.move_speed
+	if not is_on_floor():
+		velocity.y += 980 * delta
 	move_and_slide()

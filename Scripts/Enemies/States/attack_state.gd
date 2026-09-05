@@ -5,6 +5,7 @@ var attack_timer : float = 0.0
 
 func enter() -> void:
 	attack_timer = 0.0
+	enemy.velocity.x = 0
 
 func process(delta : float) -> void:
 	attack_timer -= delta
@@ -19,8 +20,4 @@ func physics_process(delta : float) -> void:
 		return
 
 	if attack_timer <= 0:
-		perform_attack()
 		attack_timer = enemy.stats.attack_cooldown
-
-func perform_attack() -> void:
-	pass

@@ -8,6 +8,7 @@
 [ext_resource type="Script" uid="uid://d13sq5bcvuwld" path="res://Scripts/Enemies/States/idle_state.gd" id="5"]
 [ext_resource type="Script" uid="uid://54fhw3jj4yvo" path="res://Scripts/Enemies/States/chase_state.gd" id="6"]
 [ext_resource type="Script" uid="uid://qghgl5p1cekh" path="res://Scripts/Enemies/States/attack_state.gd" id="7"]
+[ext_resource type="Script" path="res://Scripts/Navigation/enemy_navigation.gd" id="11_nav"]
 
 [sub_resource type="Resource" id="Resource_o4lhg"]
 script = ExtResource("2_6ljpu")
@@ -30,17 +31,17 @@ color = Color(0.532889, 0.0020645745, 1.4439226e-07, 1)
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=287525638]
 shape = SubResource("RectangleShape2D_mmoe8")
 
-[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=363177925]
-
 [node name="HealthComponent" type="Node" parent="." unique_id=1770192057]
 script = ExtResource("2")
 
 [node name="AbilityComponent" type="Node" parent="." unique_id=1156363419]
 script = ExtResource("3")
 
+[node name="EnemyNavigation" type="Node" parent="."]
+script = ExtResource("11_nav")
+
 [node name="StateMachine" type="Node" parent="." unique_id=1834278723]
 script = ExtResource("4")
-initial_state = NodePath("IdleState")
 
 [node name="IdleState" type="Node" parent="StateMachine" unique_id=1211764569]
 script = ExtResource("5")
