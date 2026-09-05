@@ -3,12 +3,14 @@
 [ext_resource type="PackedScene" uid="uid://rwu0dmkncf1m" path="res://Resources/player.tscn" id="1_5cjrv"]
 [ext_resource type="Shape2D" uid="uid://cwbq8x2ejj2wx" path="res://Resources/World/Collision Shapes/floor_collision_shape.tres" id="2_j0p05"]
 [ext_resource type="Shape2D" uid="uid://dgvw5me1278xk" path="res://Resources/World/Collision Shapes/world_border_collision_shape.tres" id="3_5nsto"]
+[ext_resource type="PackedScene" uid="uid://d2dssq6sj0iyr" path="res://Resources/Prefabs/Platform.tscn" id="3_gjpho"]
 
 [node name="Game" type="Node2D" unique_id=1272095099]
 
 [node name="Player" parent="." unique_id=1528174240 instance=ExtResource("1_5cjrv")]
 position = Vector2(0, 15)
 move_speed = 400.0
+max_jump_hold = 0.4
 
 [node name="Floor" type="StaticBody2D" parent="." unique_id=463992933]
 position = Vector2(0, 191)
@@ -24,10 +26,84 @@ color = Color(0.23753911, 0.23753914, 0.23753908, 1)
 shape = ExtResource("2_j0p05")
 debug_color = Color(0, 0.6, 0.69803923, 0)
 
-[node name="Border" type="StaticBody2D" parent="." unique_id=897051661]
-position = Vector2(438, -109)
+[node name="Platforms" type="Node2D" parent="." unique_id=1679185475]
 
-[node name="borderColor" type="ColorRect" parent="Border" unique_id=128847484]
+[node name="Platform" parent="Platforms" unique_id=9024594 instance=ExtResource("3_gjpho")]
+position = Vector2(-452, -103)
+
+[node name="Platform2" parent="Platforms" unique_id=4672271 instance=ExtResource("3_gjpho")]
+position = Vector2(170, -121)
+
+[node name="Platform3" parent="Platforms" unique_id=452226565 instance=ExtResource("3_gjpho")]
+position = Vector2(-151, -253)
+
+[node name="Platform4" parent="Platforms" unique_id=1816943598 instance=ExtResource("3_gjpho")]
+position = Vector2(-729, -193)
+
+[node name="Platform5" parent="Platforms" unique_id=1379243594 instance=ExtResource("3_gjpho")]
+position = Vector2(-475, -350)
+
+[node name="Platform6" parent="Platforms" unique_id=786559925 instance=ExtResource("3_gjpho")]
+position = Vector2(277, -349)
+
+[node name="Platform7" parent="Platforms" unique_id=628842041 instance=ExtResource("3_gjpho")]
+position = Vector2(434, -221)
+
+[node name="Platform8" parent="Platforms" unique_id=1315922381 instance=ExtResource("3_gjpho")]
+position = Vector2(656, -99)
+
+[node name="Platform9" parent="Platforms" unique_id=516432777 instance=ExtResource("3_gjpho")]
+position = Vector2(787, -8)
+
+[node name="Platform10" parent="Platforms" unique_id=1695159268 instance=ExtResource("3_gjpho")]
+position = Vector2(764, -226)
+
+[node name="Platform11" parent="Platforms" unique_id=527844257 instance=ExtResource("3_gjpho")]
+position = Vector2(403, -12)
+
+[node name="Platform12" parent="Platforms" unique_id=909107687 instance=ExtResource("3_gjpho")]
+position = Vector2(-224, -51)
+
+[node name="Platform13" parent="Platforms" unique_id=1557257327 instance=ExtResource("3_gjpho")]
+position = Vector2(-715, -53)
+
+[node name="Platform14" parent="Platforms" unique_id=1720656139 instance=ExtResource("3_gjpho")]
+position = Vector2(-1118, -53)
+
+[node name="Platform15" parent="Platforms" unique_id=1063719413 instance=ExtResource("3_gjpho")]
+position = Vector2(-1122, -264)
+
+[node name="Platform16" parent="Platforms" unique_id=1966717037 instance=ExtResource("3_gjpho")]
+position = Vector2(-906, -407)
+
+[node name="Platform17" parent="Platforms" unique_id=1043619079 instance=ExtResource("3_gjpho")]
+position = Vector2(-642, -513)
+
+[node name="Platform18" parent="Platforms" unique_id=946696255 instance=ExtResource("3_gjpho")]
+position = Vector2(-161, -456)
+
+[node name="Platform19" parent="Platforms" unique_id=1943692692 instance=ExtResource("3_gjpho")]
+position = Vector2(255, -525)
+
+[node name="Platform20" parent="Platforms" unique_id=323407924 instance=ExtResource("3_gjpho")]
+position = Vector2(609, -424)
+
+[node name="Platform21" parent="Platforms" unique_id=109003146 instance=ExtResource("3_gjpho")]
+position = Vector2(1021, -141)
+
+[node name="Platform22" parent="Platforms" unique_id=145842225 instance=ExtResource("3_gjpho")]
+position = Vector2(1006, -347)
+
+[node name="Platform23" parent="Platforms" unique_id=962036922 instance=ExtResource("3_gjpho")]
+position = Vector2(991, -523)
+
+[node name="Borders" type="Node2D" parent="." unique_id=737562487]
+
+[node name="Border" type="StaticBody2D" parent="Borders" unique_id=897051661]
+position = Vector2(1463, -709)
+scale = Vector2(1, 5)
+
+[node name="borderColor" type="ColorRect" parent="Borders/Border" unique_id=128847484]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -41,14 +117,15 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.32511863, 0.04106886, 0.08800968, 1)
 
-[node name="borderCollision" type="CollisionShape2D" parent="Border" unique_id=197682682]
+[node name="borderCollision" type="CollisionShape2D" parent="Borders/Border" unique_id=197682682]
 shape = ExtResource("3_5nsto")
 debug_color = Color(0, 0.6, 0.69803923, 0)
 
-[node name="Border2" type="StaticBody2D" parent="." unique_id=2102931686]
-position = Vector2(-442, -109)
+[node name="Border2" type="StaticBody2D" parent="Borders" unique_id=2102931686]
+position = Vector2(-1406, -709)
+scale = Vector2(1, 5)
 
-[node name="borderColor" type="ColorRect" parent="Border2" unique_id=488421897]
+[node name="borderColor" type="ColorRect" parent="Borders/Border2" unique_id=488421897]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -62,6 +139,13 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.32511863, 0.04106886, 0.08800968, 1)
 
-[node name="borderCollision" type="CollisionShape2D" parent="Border2" unique_id=761424936]
+[node name="borderCollision" type="CollisionShape2D" parent="Borders/Border2" unique_id=761424936]
 shape = ExtResource("3_5nsto")
 debug_color = Color(0, 0.6, 0.69803923, 0)
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=152582392]
+light_mask = 3
+position = Vector2(36, -349)
+enabled = false
+zoom = Vector2(0.39, 0.65)
+limit_enabled = false
