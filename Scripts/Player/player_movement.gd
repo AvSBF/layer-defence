@@ -24,5 +24,4 @@ func _calculate_jump_height() -> float:
 	var t = clamp(time_jump_pressed / controller.max_jump_hold, 0.0, 1.0)
 	var magnitude = lerpf(200, 600, t)
 	var strength = -magnitude if controller.jump_force < 0 else magnitude
-	print("Jump force %f" % strength)
 	return strength

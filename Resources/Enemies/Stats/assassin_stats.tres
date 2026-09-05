@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="EnemyStats" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://Scripts/Enemies/Resources/enemy_stats.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+max_hp = 60
+move_speed = 180
+damage = 15
+jump_force = -500
+dash_force = 400
+dash_duration = 0.15
+attack_range = 35
+attack_cooldown = 0.6

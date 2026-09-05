@@ -1,0 +1,52 @@
+[gd_scene format=3 uid="uid://cxk7n87xu1ohq"]
+
+[ext_resource type="Script" uid="uid://fup5jqppbo03" path="res://Scripts/Enemies/enemy.gd" id="1"]
+[ext_resource type="Script" uid="uid://chlxfeb7nnuhd" path="res://Scripts/Enemies/health_component.gd" id="2"]
+[ext_resource type="Script" uid="uid://db3aak4hftpbd" path="res://Scripts/Enemies/Resources/enemy_stats.gd" id="2_6ljpu"]
+[ext_resource type="Script" uid="uid://co4ovpx3dxbtm" path="res://Scripts/Enemies/ability_component.gd" id="3"]
+[ext_resource type="Script" uid="uid://bg8ff83tcsvxo" path="res://Scripts/Enemies/state_machine.gd" id="4"]
+[ext_resource type="Script" uid="uid://d13sq5bcvuwld" path="res://Scripts/Enemies/States/idle_state.gd" id="5"]
+[ext_resource type="Script" uid="uid://54fhw3jj4yvo" path="res://Scripts/Enemies/States/chase_state.gd" id="6"]
+[ext_resource type="Script" uid="uid://qghgl5p1cekh" path="res://Scripts/Enemies/States/attack_state.gd" id="7"]
+
+[sub_resource type="Resource" id="Resource_o4lhg"]
+script = ExtResource("2_6ljpu")
+metadata/_custom_type_script = "uid://db3aak4hftpbd"
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mmoe8"]
+size = Vector2(9, 32)
+
+[node name="Enemy" type="CharacterBody2D" unique_id=588531231]
+script = ExtResource("1")
+stats = SubResource("Resource_o4lhg")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=81728546]
+offset_left = -4.5
+offset_top = -16.0
+offset_right = 4.5
+offset_bottom = 16.0
+color = Color(0.532889, 0.0020645745, 1.4439226e-07, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=287525638]
+shape = SubResource("RectangleShape2D_mmoe8")
+
+[node name="NavigationAgent2D" type="NavigationAgent2D" parent="." unique_id=363177925]
+
+[node name="HealthComponent" type="Node" parent="." unique_id=1770192057]
+script = ExtResource("2")
+
+[node name="AbilityComponent" type="Node" parent="." unique_id=1156363419]
+script = ExtResource("3")
+
+[node name="StateMachine" type="Node" parent="." unique_id=1834278723]
+script = ExtResource("4")
+initial_state = NodePath("IdleState")
+
+[node name="IdleState" type="Node" parent="StateMachine" unique_id=1211764569]
+script = ExtResource("5")
+
+[node name="ChaseState" type="Node" parent="StateMachine" unique_id=35630460]
+script = ExtResource("6")
+
+[node name="AttackState" type="Node" parent="StateMachine" unique_id=1763256191]
+script = ExtResource("7")

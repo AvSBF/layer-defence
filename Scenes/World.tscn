@@ -4,6 +4,13 @@
 [ext_resource type="Shape2D" uid="uid://cwbq8x2ejj2wx" path="res://Resources/World/Collision Shapes/floor_collision_shape.tres" id="2_j0p05"]
 [ext_resource type="Shape2D" uid="uid://dgvw5me1278xk" path="res://Resources/World/Collision Shapes/world_border_collision_shape.tres" id="3_5nsto"]
 [ext_resource type="PackedScene" uid="uid://d2dssq6sj0iyr" path="res://Resources/Prefabs/Platform.tscn" id="3_gjpho"]
+[ext_resource type="Script" uid="uid://b4xhwyp4ts64n" path="res://Scenes/world_camera_smoothing.gd" id="5_p70al"]
+[ext_resource type="Script" uid="uid://doc1oo7ol18cf" path="res://Scripts/Spawners/wave_spawner.gd" id="6_spawner"]
+[ext_resource type="Script" uid="uid://dws4kdbdrg8vw" path="res://Scripts/Spawners/enemy_wave.gd" id="7_7yo87"]
+[ext_resource type="Script" uid="uid://cabqy8p7cm0l4" path="res://Scripts/Spawners/spawn_area.gd" id="7_area"]
+[ext_resource type="Script" uid="uid://153y2wxf1x7d" path="res://Scripts/Spawners/spawn_point.gd" id="8_point"]
+[ext_resource type="Resource" uid="uid://c80d6t3lmspff" path="res://Resources/Spawners/wave_1.tres" id="8_ti1bm"]
+[ext_resource type="Resource" path="res://Resources/Spawners/wave_2.tres" id="9_op4cu"]
 
 [node name="Game" type="Node2D" unique_id=1272095099]
 
@@ -100,7 +107,7 @@ position = Vector2(991, -523)
 [node name="Borders" type="Node2D" parent="." unique_id=737562487]
 
 [node name="Border" type="StaticBody2D" parent="Borders" unique_id=897051661]
-position = Vector2(1463, -709)
+position = Vector2(1500, -709)
 scale = Vector2(1, 5)
 
 [node name="borderColor" type="ColorRect" parent="Borders/Border" unique_id=128847484]
@@ -122,7 +129,7 @@ shape = ExtResource("3_5nsto")
 debug_color = Color(0, 0.6, 0.69803923, 0)
 
 [node name="Border2" type="StaticBody2D" parent="Borders" unique_id=2102931686]
-position = Vector2(-1406, -709)
+position = Vector2(-1500, -709)
 scale = Vector2(1, 5)
 
 [node name="borderColor" type="ColorRect" parent="Borders/Border2" unique_id=488421897]
@@ -145,7 +152,109 @@ debug_color = Color(0, 0.6, 0.69803923, 0)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=152582392]
 light_mask = 3
-position = Vector2(36, -349)
-enabled = false
-zoom = Vector2(0.39, 0.65)
+position = Vector2(0, -350)
+zoom = Vector2(0.52, 0.52)
 limit_enabled = false
+position_smoothing_enabled = true
+script = ExtResource("5_p70al")
+
+[node name="Spawners" type="Node2D" parent="." unique_id=1361571916]
+
+[node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "regular_spawn_points")]
+script = ExtResource("6_spawner")
+waves = Array[ExtResource("7_7yo87")]([ExtResource("8_ti1bm"), ExtResource("9_op4cu")])
+target = NodePath("../../Player")
+spawn_areas = [NodePath("../LeftArea"), NodePath("../RightArea")]
+regular_spawn_points = NodePath("../RegularSpawnPoints")
+
+[node name="LeftArea" type="Node2D" parent="Spawners" unique_id=65813441]
+script = ExtResource("7_area")
+
+[node name="SpawnPoint" type="Marker2D" parent="Spawners/LeftArea" unique_id=343069896]
+position = Vector2(-715, -53)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/LeftArea" unique_id=1752393484]
+position = Vector2(-754, -120)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/LeftArea" unique_id=622187738]
+position = Vector2(-1114, -352)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/LeftArea" unique_id=1986030279]
+position = Vector2(-1106, -127)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/LeftArea" unique_id=2120399685]
+position = Vector2(-722, -269)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint6" type="Marker2D" parent="Spawners/LeftArea" unique_id=1059878331]
+position = Vector2(-908, -515)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint7" type="Marker2D" parent="Spawners/LeftArea" unique_id=1508078758]
+position = Vector2(-666, -612)
+script = ExtResource("8_point")
+
+[node name="RightArea" type="Node2D" parent="Spawners" unique_id=1717534065]
+script = ExtResource("7_area")
+
+[node name="SpawnPoint" type="Marker2D" parent="Spawners/RightArea" unique_id=386001129]
+position = Vector2(788, -59)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RightArea" unique_id=250521171]
+position = Vector2(767, -297)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RightArea" unique_id=980888312]
+position = Vector2(610, -510)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RightArea" unique_id=1266065440]
+position = Vector2(991, -603)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RightArea" unique_id=244793342]
+position = Vector2(1020, -194)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RightArea" unique_id=859456002]
+position = Vector2(1006, -389)
+script = ExtResource("8_point")
+
+[node name="RegularSpawnPoints" type="Node2D" parent="Spawners" unique_id=996268295]
+
+[node name="SpawnPoint" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=878929586]
+position = Vector2(1008, -27)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1319156290]
+position = Vector2(1006, -236)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1486777113]
+position = Vector2(999, -449)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1279427724]
+position = Vector2(995, -630)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1627977735]
+position = Vector2(-1366, -589)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1391080115]
+position = Vector2(-1370, -421)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint7" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=710633625]
+position = Vector2(-1384, -246)
+script = ExtResource("8_point")
+
+[node name="SpawnPoint8" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1288719905]
+position = Vector2(-1402, -88)
+script = ExtResource("8_point")

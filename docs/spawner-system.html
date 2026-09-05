@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spawner System — Layer Defence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2.2em; margin-bottom: 10px; background: linear-gradient(135deg, #44cc88, #22aa66); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.5em; margin: 40px 0 20px; color: #44cc88; border-bottom: 2px solid #44cc8833; padding-bottom: 8px; }
+        h3 { font-size: 1.1em; color: #66ddaa; margin: 20px 0 10px; }
+        p { color: #aaa; margin-bottom: 15px; }
+        .subtitle { color: #666; font-size: 1.1em; margin-bottom: 30px; }
+
+        .section { background: #12121a; border-radius: 12px; padding: 30px; margin: 25px 0; border: 1px solid #222; }
+        .section.highlight { border-color: #44cc8855; }
+
+        .tree { font-family: 'Cascadia Code', 'Fira Code', monospace; background: #0d0d14; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.8; overflow-x: auto; }
+        .tree .folder { color: #ffaa44; }
+        .tree .file-gd { color: #66aaff; }
+        .tree .file-tres { color: #aaffaa; }
+        .tree .file-tscn { color: #ff88aa; }
+        .tree .comment { color: #555; font-style: italic; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .card { background: #1a1a25; border-radius: 10px; padding: 20px; border: 1px solid #2a2a35; transition: border-color 0.3s; }
+        .card:hover { border-color: #44cc8866; }
+        .card-title { font-size: 1.1em; color: #66ddaa; margin-bottom: 8px; font-weight: 600; }
+        .card-desc { color: #888; font-size: 0.9em; }
+
+        .code-block { background: #0d0d14; padding: 16px 20px; border-radius: 8px; font-family: 'Cascadia Code', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; margin: 15px 0; border: 1px solid #1a1a25; }
+        .code-block .kw { color: #cc66ff; }
+        .code-block .type { color: #44aaff; }
+        .code-block .str { color: #aadd77; }
+        .code-block .num { color: #ffaa44; }
+        .code-block .cmt { color: #555; font-style: italic; }
+        .code-block .fn { color: #ffcc44; }
+        .code-block .var { color: #ff8866; }
+
+        .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+        .flow-step { background: #1a1a25; padding: 10px 18px; border-radius: 8px; border: 1px solid #2a2a35; font-size: 0.9em; }
+        .flow-arrow { color: #44cc88; font-size: 1.2em; }
+
+        .note { background: #1a1a14; border-left: 3px solid #ffaa44; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 15px 0; font-size: 0.9em; }
+        .note strong { color: #ffaa44; }
+
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-list li { counter-increment: step; padding: 12px 0 12px 50px; position: relative; border-left: 2px solid #222; margin-left: 16px; }
+        .step-list li::before { content: counter(step); position: absolute; left: -17px; top: 12px; width: 32px; height: 32px; background: #44cc88; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; }
+
+        .diagram { text-align: center; padding: 30px; background: #0d0d14; border-radius: 10px; margin: 20px 0; overflow-x: auto; }
+        .diagram svg { max-width: 100%; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Spawner System</h1>
+        <p class="subtitle">Система спавна врагов — волны, точки, зоны</p>
+
+        <h2>1. Архитектура</h2>
+        <div class="section highlight">
+            <p>Три уровня спавна: <strong>SpawnPoint</strong> (точка), <strong>SpawnArea</strong> (зона), <strong>WaveSpawner</strong> (волны). WaveSpawner управляет всем.</p>
+            <div class="diagram">
+                <svg width="700" height="280" viewBox="0 0 700 280">
+                    <rect x="200" y="10" width="300" height="55" rx="10" fill="#223344" stroke="#4488cc" stroke-width="2"/>
+                    <text x="350" y="32" text-anchor="middle" fill="#66aaff" font-size="15" font-weight="bold">WaveSpawner</text>
+                    <text x="350" y="50" text-anchor="middle" fill="#6688aa" font-size="11">Node2D + Timer</text>
+                    <line x1="350" y1="65" x2="350" y2="90" stroke="#4488cc55" stroke-width="2"/>
+                    <rect x="80" y="90" width="200" height="55" rx="10" fill="#332233" stroke="#cc88aa" stroke-width="2"/>
+                    <text x="180" y="112" text-anchor="middle" fill="#cc88aa" font-size="14" font-weight="bold">SpawnArea</text>
+                    <text x="180" y="130" text-anchor="middle" fill="#aa6688" font-size="11">Node2D + рандом точка</text>
+                    <rect x="350" y="90" width="200" height="55" rx="10" fill="#223322" stroke="#44cc88" stroke-width="2"/>
+                    <text x="450" y="112" text-anchor="middle" fill="#44cc88" font-size="14" font-weight="bold">SpawnPoint</text>
+                    <text x="450" y="130" text-anchor="middle" fill="#338855" font-size="11">Marker2D + позиция</text>
+                    <line x1="280" y1="65" x2="180" y2="90" stroke="#cc88aa55" stroke-width="1.5" stroke-dasharray="4"/>
+                    <line x1="420" y1="65" x2="450" y2="90" stroke="#44cc8855" stroke-width="1.5" stroke-dasharray="4"/>
+                    <rect x="20" y="180" width="100" height="40" rx="6" fill="#22332255" stroke="#44cc8866" stroke-width="1"/>
+                    <text x="70" y="204" text-anchor="middle" fill="#44cc88" font-size="11">Point 1</text>
+                    <rect x="130" y="180" width="100" height="40" rx="6" fill="#22332255" stroke="#44cc8866" stroke-width="1"/>
+                    <text x="180" y="204" text-anchor="middle" fill="#44cc88" font-size="11">Point 2</text>
+                    <rect x="240" y="180" width="100" height="40" rx="6" fill="#22332255" stroke="#44cc8866" stroke-width="1"/>
+                    <text x="290" y="204" text-anchor="middle" fill="#44cc88" font-size="11">Point 3</text>
+                    <line x1="180" y1="145" x2="70" y2="180" stroke="#44cc8833" stroke-width="1"/>
+                    <line x1="180" y1="145" x2="180" y2="180" stroke="#44cc8833" stroke-width="1"/>
+                    <line x1="180" y1="145" x2="290" y2="180" stroke="#44cc8833" stroke-width="1"/>
+                    <rect x="400" y="180" width="250" height="70" rx="10" fill="#1a1a25" stroke="#333" stroke-width="1.5"/>
+                    <text x="525" y="205" text-anchor="middle" fill="#aaa" font-size="12" font-weight="bold">Enemy.tscn</text>
+                    <text x="525" y="225" text-anchor="middle" fill="#666" font-size="10">CharacterBody2D</text>
+                    <text x="525" y="240" text-anchor="middle" fill="#666" font-size="10">target = player</text>
+                    <line x1="450" y1="145" x2="525" y2="180" stroke="#44cc8833" stroke-width="1" stroke-dasharray="4"/>
+                </svg>
+            </div>
+        </div>
+
+        <h2>2. Структура файлов</h2>
+        <div class="section">
+            <div class="tree">
+                <span class="folder">Scripts/Spawners/</span><br>
+                ├── <span class="file-gd">wave_spawner.gd</span> <span class="comment">— контроллер волн</span><br>
+                ├── <span class="file-gd">spawn_area.gd</span> <span class="comment">— зона спавна (выбирает точку)</span><br>
+                └── <span class="file-gd">spawn_point.gd</span> <span class="comment">— конкретная позиция</span><br>
+                <br>
+                <span class="folder">Resources/Spawners/</span><br>
+                ├── <span class="file-gd">enemy_wave.gd</span> <span class="comment">— ресурс одной волны</span><br>
+                └── <span class="file-tres">wave_1.tres</span> ... <span class="file-tres">wave_N.tres</span><br>
+                <br>
+                <span class="folder">Scenes/</span><br>
+                └── <span class="file-tscn">World.tscn</span> <span class="comment">— добавляем спавнеры</span>
+            </div>
+        </div>
+
+        <h2>3. SpawnPoint — Точка спавна</h2>
+        <div class="section">
+            <p>Простой Marker2D. Задаёт позицию, откуда появляется враг.</p>
+            <div class="code-block">
+<span class="cmt"># spawn_point.gd</span><br>
+<span class="kw">class_name</span> <span class="type">SpawnPoint</span><br>
+<span class="kw">extends</span> <span class="type">Marker2D</span><br>
+<br>
+<span class="kw">@export var</span> <span class="var">spawn_direction</span> : <span class="type">Vector2</span> = <span class="type">Vector2</span>.LEFT<br>
+<br>
+<span class="kw">func</span> <span class="fn">get_spawn_position</span>() -> <span class="type">Vector2</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> global_position<br>
+<br>
+<span class="kw">func</span> <span class="fn">get_spawn_direction</span>() -> <span class="type">Vector2</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> spawn_direction.normalized()
+            </div>
+        </div>
+
+        <h2>4. SpawnArea — Зона спавна</h2>
+        <div class="section">
+            <p>Содержит несколько SpawnPoint-ов. Выбирает случайный при спавне.</p>
+            <div class="code-block">
+<span class="cmt"># spawn_area.gd</span><br>
+<span class="kw">class_name</span> <span class="type">SpawnArea</span><br>
+<span class="kw">extends</span> <span class="type">Node2D</span><br>
+<br>
+<span class="kw">func</span> <span class="fn">get_random_point</span>() -> <span class="type">SpawnPoint</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> points = <span class="fn">get_children</span>().<span class="fn">filter</span>(<span class="kw">func</span>(c): <span class="kw">return</span> c <span class="kw">is</span> <span class="type">SpawnPoint</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> points.<span class="fn">is_empty</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return null</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> points.<span class="fn">pick_random</span>()
+            </div>
+            <h3>Структура на сцене:</h3>
+            <div class="tree">
+                <span class="folder">SpawnArea (Node2D)</span><br>
+                ├── <span class="file-gd">SpawnPoint</span> <span class="comment">— на левой платформе</span><br>
+                ├── <span class="file-gd">SpawnPoint2</span> <span class="comment">— на средней платформе</span><br>
+                └── <span class="file-gd">SpawnPoint3</span> <span class="comment">— на правой платформе</span>
+            </div>
+        </div>
+
+        <h2>5. EnemyWave — Ресурс волны</h2>
+        <div class="section">
+            <p>Одна волна: сколько врагов, какого типа, с какой задержкой.</p>
+            <div class="code-block">
+<span class="cmt"># enemy_wave.gd</span><br>
+<span class="kw">class_name</span> <span class="type">EnemyWave</span><br>
+<span class="kw">extends</span> <span class="type">Resource</span><br>
+<br>
+<span class="kw">enum</span> <span class="type">SpawnMode</span> { AREA, POINT }<br>
+<br>
+<span class="kw">@export var</span> <span class="var">enemy_scene</span> : <span class="type">PackedScene</span><br>
+<span class="kw">@export var</span> <span class="var">stats</span> : <span class="type">EnemyStats</span><br>
+<span class="kw">@export var</span> <span class="var">count</span> : <span class="type">int</span> = <span class="num">5</span><br>
+<span class="kw">@export var</span> <span class="var">spawn_mode</span> : <span class="type">SpawnMode</span> = SpawnMode.AREA<br>
+<span class="kw">@export var</span> <span class="var">delay_between</span> : <span class="type">float</span> = <span class="num">0.5</span><br>
+<span class="kw">@export var</span> <span class="var">spawn_area</span> : <span class="type">SpawnArea</span><br>
+<span class="kw">@export var</span> <span class="var">spawn_point</span> : <span class="type">SpawnPoint</span>
+            </div>
+            <h3>Пример .tres:</h3>
+            <div class="code-block">
+<span class="cmt"># Resources/Spawners/wave_1.tres</span><br>
+[resource]<br>
+enemy_scene = <span class="str">"res://Resources/Prefabs/Enemy/Enemy.tscn"</span><br>
+stats = <span class="str">"res://Resources/Enemies/Stats/tank_stats.tres"</span><br>
+count = <span class="num">3</span><br>
+spawn_mode = <span class="num">0</span> <span class="cmt"># AREA</span><br>
+delay_between = <span class="num">1.0</span>
+            </div>
+        </div>
+
+        <h2>6. WaveSpawner — Контроллер</h2>
+        <div class="section highlight">
+            <p>Главный скрипт. Управляет волнами, таймерами, количеством врагов.</p>
+            <div class="code-block">
+<span class="cmt"># wave_spawner.gd</span><br>
+<span class="kw">class_name</span> <span class="type">WaveSpawner</span><br>
+<span class="kw">extends</span> <span class="type">Node2D</span><br>
+<br>
+<span class="kw">signal</span> <span class="fn">wave_started</span>(wave_index : <span class="type">int</span>)<br>
+<span class="kw">signal</span> <span class="fn">wave_completed</span>(wave_index : <span class="type">int</span>)<br>
+<span class="kw">signal</span> <span class="fn">all_waves_completed</span><br>
+<br>
+<span class="kw">@export var</span> <span class="var">waves</span> : <span class="type">Array</span>[<span class="type">EnemyWave</span>] = []<br>
+<span class="kw">@export var</span> <span class="var">delay_between_waves</span> : <span class="type">float</span> = <span class="num">5.0</span><br>
+<span class="kw">@export var</span> <span class="var">auto_start</span> : <span class="type">bool</span> = <span class="num">true</span><br>
+<span class="kw">@export var</span> <span class="var">target</span> : <span class="type">Node2D</span><br>
+<br>
+<span class="kw">var</span> <span class="var">current_wave</span> : <span class="type">int</span> = <span class="num">0</span><br>
+<span class="kw">var</span> <span class="var">enemies_alive</span> : <span class="type">int</span> = <span class="num">0</span><br>
+<span class="kw">var</span> <span class="var">is_spawning</span> : <span class="type">bool</span> = <span class="num">false</span><br>
+<br>
+<span class="kw">func</span> <span class="fn">_ready</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> auto_start:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">start_waves</span>()<br>
+<br>
+<span class="kw">func</span> <span class="fn">start_waves</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;current_wave = <span class="num">0</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_spawn_next_wave</span>()<br>
+<br>
+<span class="kw">func</span> <span class="fn">_spawn_next_wave</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> current_wave >= waves.<span class="fn">size</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;all_waves_completed.<span class="fn">emit</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> wave = waves[current_wave]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;wave_started.<span class="fn">emit</span>(current_wave)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_spawn_enemies</span>(wave)<br>
+<br>
+<span class="kw">func</span> <span class="fn">_spawn_enemies</span>(wave : <span class="type">EnemyWave</span>) -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is_spawning = <span class="num">true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> i <span class="kw">in</span> wave.count:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> spawn_pos = <span class="fn">_get_spawn_position</span>(wave)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_create_enemy</span>(wave, spawn_pos)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> i < wave.count - <span class="num">1</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">await</span> <span class="fn">get_tree</span>().<span class="fn">create_timer</span>(wave.delay_between).timeout<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is_spawning = <span class="num">false</span><br>
+<br>
+<span class="kw">func</span> <span class="fn">_get_spawn_position</span>(wave : <span class="type">EnemyWave</span>) -> <span class="type">Vector2</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> wave.spawn_mode == EnemyWave.SpawnMode.AREA <span class="kw">and</span> wave.spawn_area:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> point = wave.spawn_area.<span class="fn">get_random_point</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> point:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> point.<span class="fn">get_spawn_position</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">elif</span> wave.spawn_mode == EnemyWave.SpawnMode.POINT <span class="kw">and</span> wave.spawn_point:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> wave.spawn_point.<span class="fn">get_spawn_position</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> global_position<br>
+<br>
+<span class="kw">func</span> <span class="fn">_create_enemy</span>(wave : <span class="type">EnemyWave</span>, pos : <span class="type">Vector2</span>) -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> enemy = wave.enemy_scene.<span class="fn">instantiate</span>()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemy.stats = wave.stats<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemy.target = target<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemy.global_position = pos<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemy.health_component.died.<span class="fn">connect</span>(<span class="fn">_on_enemy_died</span>)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemies_alive += <span class="num">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">add_child</span>(enemy)<br>
+<br>
+<span class="kw">func</span> <span class="fn">_on_enemy_died</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;enemies_alive -= <span class="num">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> enemies_alive <= <span class="num">0</span> <span class="kw">and not</span> is_spawning:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;wave_completed.<span class="fn">emit</span>(current_wave)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;current_wave += <span class="num">1</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">await</span> <span class="fn">get_tree</span>().<span class="fn">create_timer</span>(delay_between_waves).timeout<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_spawn_next_wave</span>()
+            </div>
+        </div>
+
+        <h2>7. Как это работает</h2>
+        <div class="section">
+            <div class="flow">
+                <div class="flow-step">1. WaveSpawner стартует</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">2. Берёт wave[0]</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">3. Спавнит N врагов</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">4. Ждёт пока умрут</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">5. Пауза → wave[1]</div>
+            </div>
+            <div class="code-block">
+<span class="cmt"># Волна 1: 3 танка, слева</span><br>
+<span class="cmt"># Волна 2: 5 ассассинов, справа</span><br>
+<span class="cmt"># Волна 3: 2 танка + 3 снайпера, обе зоны</span><br>
+<br>
+<span class="cmt"># Враги спавнятся из SpawnArea (случайная точка)</span><br>
+<span class="cmt"># Каждый враг получает target = Player</span><br>
+<span class="cmt"># После убийства всех → пауза → следующая волна</span>
+            </div>
+        </div>
+
+        <h2>8. Интеграция с World.tscn</h2>
+        <div class="section">
+            <h3>Структура на сцене:</h3>
+            <div class="tree">
+                <span class="folder">Game (Node2D)</span><br>
+                ├── <span class="file-tscn">Player</span><br>
+                ├── <span class="folder">Platforms/</span><br>
+                │   └── ...<br>
+                ├── <span class="folder">Spawners/</span> <span class="comment">← новый контейнер</span><br>
+                │   ├── <span class="file-gd">WaveSpawner</span> <span class="comment">— Node2D + wave_spawner.gd</span><br>
+                │   ├── <span class="folder">LeftArea/</span> <span class="comment">— SpawnArea</span><br>
+                │   │   ├── SpawnPoint (-715, -53)<br>
+                │   │   ├── SpawnPoint (-1118, -53)<br>
+                │   │   └── SpawnPoint (-1122, -264)<br>
+                │   └── <span class="folder">RightArea/</span> <span class="comment">— SpawnArea</span><br>
+                │       ├── SpawnPoint (787, -8)<br>
+                │       ├── SpawnPoint (1021, -141)<br>
+                │       └── SpawnPoint (1006, -347)<br>
+                └── Camera2D
+            </div>
+        </div>
+
+        <h2>9. Как добавить новую волну</h2>
+        <div class="section">
+            <ol class="step-list">
+                <li>Создай .tres: <code>Resources/Spawners/wave_N.tres</code></li>
+                <li>Выбери EnemyScene (префаб врага)</li>
+                <li>Выбери Stats (тип врага)</li>
+                <li>Задай count — сколько врагов</li>
+                <li>Выбери SpawnArea или SpawnPoint</li>
+                <li>Добавь .tres в массив waves на WaveSpawner</li>
+                <li>Готово</li>
+            </ol>
+        </div>
+
+        <h2>10. Диаграмма потока</h2>
+        <div class="section">
+            <div class="diagram">
+                <svg width="500" height="300" viewBox="0 0 500 300">
+                    <rect x="160" y="10" width="180" height="36" rx="18" fill="#223344" stroke="#4488cc" stroke-width="2"/>
+                    <text x="250" y="33" text-anchor="middle" fill="#66aaff" font-size="12" font-weight="bold">_ready()</text>
+                    <line x1="250" y1="46" x2="250" y2="65" stroke="#4488cc" stroke-width="2" marker-end="url(#ag)"/>
+                    <polygon points="250,65 330,95 250,125 170,95" fill="#1a1a25" stroke="#44cc88" stroke-width="1.5"/>
+                    <text x="250" y="100" text-anchor="middle" fill="#44cc88" font-size="11">auto_start?</text>
+                    <line x1="250" y1="125" x2="250" y2="145" stroke="#44cc88" stroke-width="2" marker-end="url(#ag)"/>
+                    <text x="262" y="138" fill="#888" font-size="9">да</text>
+                    <rect x="175" y="145" width="150" height="32" rx="6" fill="#223344" stroke="#4488cc" stroke-width="1.5"/>
+                    <text x="250" y="165" text-anchor="middle" fill="#66aaff" font-size="11">start_waves()</text>
+                    <line x1="250" y1="177" x2="250" y2="195" stroke="#4488cc" stroke-width="2" marker-end="url(#ag)"/>
+                    <rect x="155" y="195" width="190" height="32" rx="6" fill="#332233" stroke="#cc88aa" stroke-width="1.5"/>
+                    <text x="250" y="215" text-anchor="middle" fill="#cc88aa" font-size="11">_spawn_next_wave()</text>
+                    <line x1="250" y1="227" x2="250" y2="245" stroke="#cc88aa" stroke-width="2" marker-end="url(#ag)"/>
+                    <polygon points="250,245 340,275 250,305 160,275" fill="#1a1a25" stroke="#44cc88" stroke-width="1.5"/>
+                    <text x="250" y="280" text-anchor="middle" fill="#44cc88" font-size="11">есть волны?</text>
+                    <line x1="250" y1="305" x2="250" y2="330" stroke="#44cc88" stroke-width="2" marker-end="url(#ag)"/>
+                    <text x="262" y="320" fill="#888" font-size="9">да</text>
+                    <rect x="145" y="330" width="210" height="32" rx="6" fill="#223322" stroke="#44cc88" stroke-width="1.5"/>
+                    <text x="250" y="350" text-anchor="middle" fill="#44cc88" font-size="11">_spawn_enemies(wave)</text>
+                    <line x1="340" y1="275" x2="420" y2="275" stroke="#884444" stroke-width="2" marker-end="url(#ag)"/>
+                    <text x="370" y="268" fill="#888" font-size="9">нет</text>
+                    <rect x="420" y="260" width="70" height="32" rx="6" fill="#2a1a1a" stroke="#aa5555" stroke-width="1.5"/>
+                    <text x="455" y="280" text-anchor="middle" fill="#cc7777" font-size="11">end</text>
+                    <defs><marker id="ag" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#44cc88"/></marker></defs>
+                </svg>
+            </div>
+        </div>
+
+        <h2>11. Итого</h2>
+        <div class="section">
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">SpawnPoint</div>
+                    <div class="card-desc">Marker2D. Одна точка на платформе.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">SpawnArea</div>
+                    <div class="card-desc">Контейнер точек. Выбирает случайный.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">EnemyWave</div>
+                    <div class="card-desc">.tres: тип врага, кол-во, задержка, зона.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">WaveSpawner</div>
+                    <div class="card-desc">Контроллер. Запускает волны по очереди.</div>
+                </div>
+            </div>
+            <div class="note" style="margin-top:20px;">
+                <strong>Масштабирование:</strong> Новые волны = новые .tres. Новые зоны = новые SpawnArea с детьми-точками. Код не трогаем.
+            </div>
+        </div>
+
+        <p style="text-align:center; color:#444; margin-top:40px; font-size:0.9em;">Layer Defence — Spawner System Documentation</p>
+    </div>
+</body>
+</html>

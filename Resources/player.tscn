@@ -20,6 +20,7 @@ texture = ExtResource("2_hxkbv")
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=202886270]
 position = Vector2(0, -81)
+enabled = false
 zoom = Vector2(1.475, 1.475)
 position_smoothing_speed = 7.0
 
