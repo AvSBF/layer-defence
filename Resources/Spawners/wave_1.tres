@@ -2,12 +2,11 @@
 
 [ext_resource type="Script" uid="uid://dws4kdbdrg8vw" path="res://Scripts/Spawners/enemy_wave.gd" id="1"]
 [ext_resource type="PackedScene" uid="uid://cxk7n87xu1ohq" path="res://Resources/Prefabs/Enemy/Enemy.tscn" id="2"]
-[ext_resource type="Resource" path="res://Resources/Enemies/Stats/assassin_stats.tres" id="3_nlyo3"]
+[ext_resource type="Resource" path="res://Resources/Enemies/Stats/ranged_stats.tres" id="3_nlyo3"]
 
 [resource]
 script = ExtResource("1")
 enemy_scene = ExtResource("2")
 stats = ExtResource("3_nlyo3")
 count = 3
-spawn_mode = 1
 delay_between = 1.0

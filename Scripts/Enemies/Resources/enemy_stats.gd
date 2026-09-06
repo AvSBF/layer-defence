@@ -9,3 +9,4 @@ extends Resource
 @export var dash_duration : float = 0.2
 @export var attack_range : float = 50
 @export var attack_cooldown : float = 1.0
+@export var abilities : Array[EnemyAbility] = []

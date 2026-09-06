@@ -8,7 +8,6 @@
 [ext_resource type="Script" uid="uid://d13sq5bcvuwld" path="res://Scripts/Enemies/States/idle_state.gd" id="5"]
 [ext_resource type="Script" uid="uid://54fhw3jj4yvo" path="res://Scripts/Enemies/States/chase_state.gd" id="6"]
 [ext_resource type="Script" uid="uid://qghgl5p1cekh" path="res://Scripts/Enemies/States/attack_state.gd" id="7"]
-[ext_resource type="Script" path="res://Scripts/Navigation/enemy_navigation.gd" id="11_nav"]
 
 [sub_resource type="Resource" id="Resource_o4lhg"]
 script = ExtResource("2_6ljpu")
@@ -20,6 +19,8 @@ size = Vector2(9, 32)
 [node name="Enemy" type="CharacterBody2D" unique_id=588531231]
 script = ExtResource("1")
 stats = SubResource("Resource_o4lhg")
+collision_layer = 2
+collision_mask = 3
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=81728546]
 offset_left = -4.5
@@ -36,9 +37,6 @@ script = ExtResource("2")
 
 [node name="AbilityComponent" type="Node" parent="." unique_id=1156363419]
 script = ExtResource("3")
-
-[node name="EnemyNavigation" type="Node" parent="."]
-script = ExtResource("11_nav")
 
 [node name="StateMachine" type="Node" parent="." unique_id=1834278723]
 script = ExtResource("4")

@@ -1,0 +1,77 @@
+[gd_resource type="SpriteFrames" format=3 uid="uid://nvq15fa6ao5p"]
+
+[ext_resource type="Texture2D" uid="uid://u3n6jqbxqro3" path="res://Aseprites/Debug/Swordaseprite.png" id="1_2tr8q"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fx16u"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_8u6tq"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lxerx"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_huswh"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ljwev"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_1cxu3"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hp4lk"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(192, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_65t6c"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(224, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_hv23u"]
+atlas = ExtResource("1_2tr8q")
+region = Rect2(256, 0, 32, 32)
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fx16u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8u6tq")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_lxerx")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_huswh")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ljwev")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_1cxu3")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hp4lk")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_65t6c")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_hv23u")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fx16u")
+}],
+"loop": 0,
+"name": &"SwordSwingAnimation",
+"speed": 30.0
+}]

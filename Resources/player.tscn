@@ -4,12 +4,19 @@
 [ext_resource type="Texture2D" uid="uid://dmnv2hvtie3g6" path="res://Aseprites/Debug/Debug-Player.png" id="2_hxkbv"]
 [ext_resource type="Script" uid="uid://32yqddauefmw" path="res://Scripts/Player/player_movement.gd" id="3_i1ew7"]
 [ext_resource type="Script" uid="uid://dbpwqnf23hok5" path="res://Scripts/Player/player_camera_movement.gd" id="4_hxkbv"]
+[ext_resource type="Script" uid="uid://cnjm62ac3t0wk" path="res://Scripts/Player/weapon_position.gd" id="5_h3mv7"]
+[ext_resource type="SpriteFrames" uid="uid://nvq15fa6ao5p" path="res://Resources/Animations/SpriteFrames/SwordFrames.tres" id="5_i1ew7"]
+[ext_resource type="Script" uid="uid://bm3iifsxxinia" path="res://Scripts/Player/player_attack_controller.gd" id="5_id0qi"]
+[ext_resource type="PackedScene" uid="uid://ddx8xxemw5btq" path="res://Resources/Prefabs/Weapons/weapon_wave.tscn" id="6_e0r74"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_j0p05"]
 size = Vector2(9, 32)
 
-[node name="Player" type="CharacterBody2D" unique_id=1528174240]
+[node name="Player" type="CharacterBody2D" unique_id=1528174240 node_paths=PackedStringArray("attack_controller")]
+collision_mask = 3
 script = ExtResource("1_2buye")
+attack_controller = NodePath("Attack Controller")
+metadata/looking_left = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=542209969]
 position = Vector2(-0.5, 0)
@@ -31,3 +38,19 @@ script = ExtResource("3_i1ew7")
 script = ExtResource("4_hxkbv")
 max_distance_x = 100.0
 max_distance_y = 50.0
+
+[node name="Attack Controller" type="Node" parent="." unique_id=875859914 node_paths=PackedStringArray("weapon_animation")]
+script = ExtResource("5_id0qi")
+weapon_animation = NodePath("../Weapon/Sword_AnimatedWeapon")
+weapon_wave = ExtResource("6_e0r74")
+
+[node name="Weapon" type="Node2D" parent="." unique_id=644896015]
+position = Vector2(11, -1)
+script = ExtResource("5_h3mv7")
+
+[node name="Sword_AnimatedWeapon" type="AnimatedSprite2D" parent="Weapon" unique_id=2004697177]
+position = Vector2(10, -10)
+sprite_frames = ExtResource("5_i1ew7")
+animation = &"SwordSwingAnimation"
+frame = 9
+frame_progress = 1.0

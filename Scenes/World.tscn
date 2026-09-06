@@ -6,25 +6,19 @@
 [ext_resource type="PackedScene" uid="uid://d2dssq6sj0iyr" path="res://Resources/Prefabs/Platform.tscn" id="3_gjpho"]
 [ext_resource type="Script" uid="uid://b4xhwyp4ts64n" path="res://Scenes/world_camera_smoothing.gd" id="5_p70al"]
 [ext_resource type="Script" uid="uid://doc1oo7ol18cf" path="res://Scripts/Spawners/wave_spawner.gd" id="6_spawner"]
-[ext_resource type="Script" uid="uid://dws4kdbdrg8vw" path="res://Scripts/Spawners/enemy_wave.gd" id="7_7yo87"]
 [ext_resource type="Script" uid="uid://cabqy8p7cm0l4" path="res://Scripts/Spawners/spawn_area.gd" id="7_area"]
 [ext_resource type="Script" uid="uid://153y2wxf1x7d" path="res://Scripts/Spawners/spawn_point.gd" id="8_point"]
-[ext_resource type="Resource" uid="uid://c80d6t3lmspff" path="res://Resources/Spawners/wave_1.tres" id="8_ti1bm"]
-[ext_resource type="Resource" path="res://Resources/Spawners/wave_2.tres" id="9_op4cu"]
-[ext_resource type="Script" path="res://Scripts/Navigation/platform_graph.gd" id="10_graph"]
-[ext_resource type="Script" path="res://Scripts/Navigation/enemy_navigation.gd" id="11_nav"]
+[ext_resource type="Script" uid="uid://cofk61bgusjo5" path="res://Scripts/cursor_position.gd" id="9_kn06e"]
+[ext_resource type="Texture2D" uid="uid://e7d40cprgtsn" path="res://Aseprites/Debug/Cursor.png" id="9_uo7di"]
 
 [node name="Game" type="Node2D" unique_id=1272095099]
-
-[node name="PlatformGraph" type="Node" parent="." groups=["platform_graph"]]
-script = ExtResource("10_graph")
 
 [node name="Player" parent="." unique_id=1528174240 instance=ExtResource("1_5cjrv")]
 position = Vector2(0, 15)
 move_speed = 400.0
 max_jump_hold = 0.4
 
-[node name="Floor" type="StaticBody2D" parent="." unique_id=463992933]
+[node name="Floor" type="StaticBody2D" parent="." unique_id=671057657]
 position = Vector2(0, 191)
 
 [node name="ColorRect" type="ColorRect" parent="Floor" unique_id=54723674]
@@ -41,73 +35,25 @@ debug_color = Color(0, 0.6, 0.69803923, 0)
 [node name="Platforms" type="Node2D" parent="." unique_id=1679185475]
 
 [node name="Platform" parent="Platforms" unique_id=9024594 instance=ExtResource("3_gjpho")]
-position = Vector2(-452, -103)
+position = Vector2(0, -53)
 
-[node name="Platform2" parent="Platforms" unique_id=4672271 instance=ExtResource("3_gjpho")]
-position = Vector2(170, -121)
+[node name="Platform2" parent="Platforms" unique_id=220360253 instance=ExtResource("3_gjpho")]
+position = Vector2(-407, -53)
 
-[node name="Platform3" parent="Platforms" unique_id=452226565 instance=ExtResource("3_gjpho")]
-position = Vector2(-151, -253)
+[node name="Platform3" parent="Platforms" unique_id=30454642 instance=ExtResource("3_gjpho")]
+position = Vector2(-754, -53)
 
-[node name="Platform4" parent="Platforms" unique_id=1816943598 instance=ExtResource("3_gjpho")]
-position = Vector2(-729, -193)
+[node name="Platform4" parent="Platforms" unique_id=1293858423 instance=ExtResource("3_gjpho")]
+position = Vector2(393, -53)
 
-[node name="Platform5" parent="Platforms" unique_id=1379243594 instance=ExtResource("3_gjpho")]
-position = Vector2(-475, -350)
+[node name="Platform5" parent="Platforms" unique_id=292471950 instance=ExtResource("3_gjpho")]
+position = Vector2(748, -53)
 
-[node name="Platform6" parent="Platforms" unique_id=786559925 instance=ExtResource("3_gjpho")]
-position = Vector2(277, -349)
+[node name="Platform6" parent="Platforms" unique_id=1347656933 instance=ExtResource("3_gjpho")]
+position = Vector2(579, -153)
 
-[node name="Platform7" parent="Platforms" unique_id=628842041 instance=ExtResource("3_gjpho")]
-position = Vector2(434, -221)
-
-[node name="Platform8" parent="Platforms" unique_id=1315922381 instance=ExtResource("3_gjpho")]
-position = Vector2(656, -99)
-
-[node name="Platform9" parent="Platforms" unique_id=516432777 instance=ExtResource("3_gjpho")]
-position = Vector2(787, -8)
-
-[node name="Platform10" parent="Platforms" unique_id=1695159268 instance=ExtResource("3_gjpho")]
-position = Vector2(764, -226)
-
-[node name="Platform11" parent="Platforms" unique_id=527844257 instance=ExtResource("3_gjpho")]
-position = Vector2(403, -12)
-
-[node name="Platform12" parent="Platforms" unique_id=909107687 instance=ExtResource("3_gjpho")]
-position = Vector2(-224, -51)
-
-[node name="Platform13" parent="Platforms" unique_id=1557257327 instance=ExtResource("3_gjpho")]
-position = Vector2(-715, -53)
-
-[node name="Platform14" parent="Platforms" unique_id=1720656139 instance=ExtResource("3_gjpho")]
-position = Vector2(-1118, -53)
-
-[node name="Platform15" parent="Platforms" unique_id=1063719413 instance=ExtResource("3_gjpho")]
-position = Vector2(-1122, -264)
-
-[node name="Platform16" parent="Platforms" unique_id=1966717037 instance=ExtResource("3_gjpho")]
-position = Vector2(-906, -407)
-
-[node name="Platform17" parent="Platforms" unique_id=1043619079 instance=ExtResource("3_gjpho")]
-position = Vector2(-642, -513)
-
-[node name="Platform18" parent="Platforms" unique_id=946696255 instance=ExtResource("3_gjpho")]
-position = Vector2(-161, -456)
-
-[node name="Platform19" parent="Platforms" unique_id=1943692692 instance=ExtResource("3_gjpho")]
-position = Vector2(255, -525)
-
-[node name="Platform20" parent="Platforms" unique_id=323407924 instance=ExtResource("3_gjpho")]
-position = Vector2(609, -424)
-
-[node name="Platform21" parent="Platforms" unique_id=109003146 instance=ExtResource("3_gjpho")]
-position = Vector2(1021, -141)
-
-[node name="Platform22" parent="Platforms" unique_id=145842225 instance=ExtResource("3_gjpho")]
-position = Vector2(1006, -347)
-
-[node name="Platform23" parent="Platforms" unique_id=962036922 instance=ExtResource("3_gjpho")]
-position = Vector2(991, -523)
+[node name="Platform7" parent="Platforms" unique_id=733999845 instance=ExtResource("3_gjpho")]
+position = Vector2(-578, -153)
 
 [node name="Borders" type="Node2D" parent="." unique_id=737562487]
 
@@ -157,8 +103,8 @@ debug_color = Color(0, 0.6, 0.69803923, 0)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=152582392]
 light_mask = 3
-position = Vector2(0, -350)
-zoom = Vector2(0.52, 0.52)
+position = Vector2(0, -260)
+zoom = Vector2(0.6, 0.6)
 limit_enabled = false
 position_smoothing_enabled = true
 script = ExtResource("5_p70al")
@@ -167,99 +113,85 @@ script = ExtResource("5_p70al")
 
 [node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "spawn_points")]
 script = ExtResource("6_spawner")
-waves = Array[ExtResource("7_7yo87")]([ExtResource("8_ti1bm"), ExtResource("9_op4cu")])
 target = NodePath("../../Player")
 spawn_areas = [NodePath("../LeftArea"), NodePath("../RightArea")]
-spawn_points = [NodePath("../RegularSpawnPoints/SpawnPoint"), NodePath("../RegularSpawnPoints/SpawnPoint2"), NodePath("../RegularSpawnPoints/SpawnPoint3"), NodePath("../RegularSpawnPoints/SpawnPoint4"), NodePath("../RegularSpawnPoints/SpawnPoint5"), NodePath("../RegularSpawnPoints/SpawnPoint6"), NodePath("../RegularSpawnPoints/SpawnPoint7"), NodePath("../RegularSpawnPoints/SpawnPoint8")]
+spawn_points = NodePath("../RegularSpawnPoints")
 
 [node name="LeftArea" type="Node2D" parent="Spawners" unique_id=65813441]
 script = ExtResource("7_area")
 
 [node name="SpawnPoint" type="Marker2D" parent="Spawners/LeftArea" unique_id=343069896]
-position = Vector2(-715, -53)
+position = Vector2(-753, -92)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/LeftArea" unique_id=1752393484]
-position = Vector2(-754, -120)
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/LeftArea" unique_id=1454889286]
+position = Vector2(-578, -194)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/LeftArea" unique_id=622187738]
-position = Vector2(-1114, -352)
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/LeftArea" unique_id=500614824]
+position = Vector2(-957, -8)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/LeftArea" unique_id=1986030279]
-position = Vector2(-1106, -127)
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/LeftArea" unique_id=1058120619]
+position = Vector2(-1018, -8)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/LeftArea" unique_id=2120399685]
-position = Vector2(-722, -269)
-script = ExtResource("8_point")
-
-[node name="SpawnPoint6" type="Marker2D" parent="Spawners/LeftArea" unique_id=1059878331]
-position = Vector2(-908, -515)
-script = ExtResource("8_point")
-
-[node name="SpawnPoint7" type="Marker2D" parent="Spawners/LeftArea" unique_id=1508078758]
-position = Vector2(-666, -612)
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/LeftArea" unique_id=29827835]
+position = Vector2(-1084, -9)
 script = ExtResource("8_point")
 
 [node name="RightArea" type="Node2D" parent="Spawners" unique_id=1717534065]
 script = ExtResource("7_area")
 
 [node name="SpawnPoint" type="Marker2D" parent="Spawners/RightArea" unique_id=386001129]
-position = Vector2(788, -59)
+position = Vector2(747, -106)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RightArea" unique_id=250521171]
-position = Vector2(767, -297)
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RightArea" unique_id=1633373831]
+position = Vector2(581, -214)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RightArea" unique_id=980888312]
-position = Vector2(610, -510)
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RightArea" unique_id=1877183112]
+position = Vector2(929, -15)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RightArea" unique_id=1266065440]
-position = Vector2(991, -603)
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RightArea" unique_id=791154691]
+position = Vector2(1005, -17)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RightArea" unique_id=244793342]
-position = Vector2(1020, -194)
-script = ExtResource("8_point")
-
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RightArea" unique_id=859456002]
-position = Vector2(1006, -389)
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RightArea" unique_id=194317165]
+position = Vector2(1087, -16)
 script = ExtResource("8_point")
 
 [node name="RegularSpawnPoints" type="Node2D" parent="Spawners" unique_id=996268295]
 
-[node name="SpawnPoint" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=878929586]
-position = Vector2(1008, -27)
+[node name="SpawnPoint" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1901048351]
+position = Vector2(1378, -24)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1319156290]
-position = Vector2(1006, -236)
+[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=780988329]
+position = Vector2(1378, -114)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1486777113]
-position = Vector2(999, -449)
+[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=462977602]
+position = Vector2(1378, -202)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1279427724]
-position = Vector2(995, -630)
+[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=646003529]
+position = Vector2(-1393, -229)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1627977735]
-position = Vector2(-1366, -589)
+[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=755815000]
+position = Vector2(-1395, -128)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1391080115]
-position = Vector2(-1370, -421)
+[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1389202833]
+position = Vector2(-1393, -33)
 script = ExtResource("8_point")
 
-[node name="SpawnPoint7" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=710633625]
-position = Vector2(-1384, -246)
-script = ExtResource("8_point")
+[node name="Cursor" type="Node2D" parent="." unique_id=237535251]
+scale = Vector2(3, 3)
+script = ExtResource("9_kn06e")
 
-[node name="SpawnPoint8" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1288719905]
-position = Vector2(-1402, -88)
-script = ExtResource("8_point")
+[node name="Cursor Sprite" type="Sprite2D" parent="Cursor" unique_id=1905857020]
+texture = ExtResource("9_uo7di")

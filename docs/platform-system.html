@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform System — Layer Defence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2.2em; margin-bottom: 10px; background: linear-gradient(135deg, #44cc88, #22aa66); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.5em; margin: 40px 0 20px; color: #44cc88; border-bottom: 2px solid #44cc8833; padding-bottom: 8px; }
+        h3 { font-size: 1.1em; color: #66ddaa; margin: 20px 0 10px; }
+        p { color: #aaa; margin-bottom: 15px; }
+        .subtitle { color: #666; font-size: 1.1em; margin-bottom: 30px; }
+
+        .section { background: #12121a; border-radius: 12px; padding: 30px; margin: 25px 0; border: 1px solid #222; }
+        .section.highlight { border-color: #44cc8855; }
+
+        .tree { font-family: 'Cascadia Code', 'Fira Code', monospace; background: #0d0d14; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.8; overflow-x: auto; }
+        .tree .folder { color: #ffaa44; }
+        .tree .file-gd { color: #66aaff; }
+        .tree .file-tscn { color: #ff88aa; }
+        .tree .comment { color: #555; font-style: italic; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 20px 0; }
+        .card { background: #1a1a25; border-radius: 10px; padding: 20px; border: 1px solid #2a2a35; transition: border-color 0.3s; }
+        .card:hover { border-color: #44cc8866; }
+        .card-title { font-size: 1.1em; color: #66ddaa; margin-bottom: 8px; font-weight: 600; }
+        .card-desc { color: #888; font-size: 0.9em; }
+
+        .stats-bar { display: flex; gap: 8px; margin: 12px 0; flex-wrap: wrap; }
+        .stat { background: #222230; padding: 4px 10px; border-radius: 6px; font-size: 0.85em; }
+        .stat-label { color: #666; }
+        .stat-val { color: #66ddaa; font-weight: 600; }
+
+        .code-block { background: #0d0d14; padding: 16px 20px; border-radius: 8px; font-family: 'Cascadia Code', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; margin: 15px 0; border: 1px solid #1a1a25; }
+        .code-block .kw { color: #cc66ff; }
+        .code-block .type { color: #44aaff; }
+        .code-block .str { color: #aadd77; }
+        .code-block .num { color: #ffaa44; }
+        .code-block .cmt { color: #555; font-style: italic; }
+        .code-block .fn { color: #ffcc44; }
+
+        .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+        .flow-step { background: #1a1a25; padding: 10px 18px; border-radius: 8px; border: 1px solid #2a2a35; font-size: 0.9em; }
+        .flow-arrow { color: #44cc88; font-size: 1.2em; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600; margin-left: 6px; }
+        .badge-layer { background: #223344; color: #44aaff; }
+        .badge-group { background: #334422; color: #88cc44; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { text-align: left; padding: 10px; background: #1a1a25; color: #66ddaa; font-weight: 600; }
+        td { padding: 10px; border-top: 1px solid #1a1a25; }
+        tr:hover td { background: #14141c; }
+
+        .step-list { counter-reset: step; list-style: none; padding: 0; }
+        .step-list li { counter-increment: step; padding: 12px 0 12px 50px; position: relative; border-left: 2px solid #222; margin-left: 16px; }
+        .step-list li::before { content: counter(step); position: absolute; left: -17px; top: 12px; width: 32px; height: 32px; background: #44cc88; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; }
+
+        .diagram { text-align: center; padding: 30px; background: #0d0d14; border-radius: 10px; margin: 20px 0; }
+        .diagram svg { max-width: 100%; }
+
+        .warning { background: #332222; border: 1px solid #aa4444; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .warning-title { color: #ff6666; font-weight: 600; margin-bottom: 5px; }
+
+        .tip { background: #223322; border: 1px solid #44aa44; border-radius: 8px; padding: 15px; margin: 15px 0; }
+        .tip-title { color: #66cc66; font-weight: 600; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Platform System</h1>
+        <p class="subtitle">Система платформ для Layer Defence — односторонние платформы, проваливание, collision layers</p>
+
+        <!-- ARCHITECTURE OVERVIEW -->
+        <h2>1. Архитектура</h2>
+        <div class="section highlight">
+            <p>Система платформ использует <strong>Collision Layers</strong> для разделения физики пола и платформ. Платформы — односторонние (one-way), через них можно прыгнуть снизу, но можно провалиться сверху.</p>
+            <div class="diagram">
+                <svg width="700" height="280" viewBox="0 0 700 280">
+                    <!-- Player -->
+                    <rect x="280" y="10" width="140" height="50" rx="8" fill="#44cc8822" stroke="#44cc88" stroke-width="2"/>
+                    <text x="350" y="40" text-anchor="middle" fill="#66ddaa" font-size="14" font-weight="bold">Player</text>
+
+                    <!-- Lines down -->
+                    <line x1="350" y1="60" x2="350" y2="90" stroke="#333" stroke-width="1.5"/>
+
+                    <!-- Collision Mask -->
+                    <rect x="200" y="90" width="300" height="50" rx="8" fill="#223344" stroke="#4488cc" stroke-width="1.5"/>
+                    <text x="350" y="112" text-anchor="middle" fill="#66aaff" font-size="12" font-weight="bold">Collision Mask: 3 (Layer 1 + Layer 2)</text>
+                    <text x="350" y="128" text-anchor="middle" fill="#888" font-size="10">Столкновения с полом и платформами</text>
+
+                    <!-- Floor -->
+                    <rect x="50" y="200" width="200" height="60" rx="8" fill="#333322" stroke="#aaaa44" stroke-width="1.5"/>
+                    <text x="150" y="225" text-anchor="middle" fill="#cccc66" font-size="13" font-weight="bold">Floor</text>
+                    <text x="150" y="245" text-anchor="middle" fill="#888" font-size="10">Layer 1 | StaticBody2D</text>
+
+                    <!-- Platform -->
+                    <rect x="450" y="200" width="200" height="60" rx="8" fill="#223344" stroke="#4488cc" stroke-width="1.5"/>
+                    <text x="550" y="225" text-anchor="middle" fill="#66aaff" font-size="13" font-weight="bold">Platform</text>
+                    <text x="550" y="245" text-anchor="middle" fill="#888" font-size="10">Layer 2 | One-Way Collision</text>
+
+                    <!-- Lines to floor/platform -->
+                    <line x1="350" y1="140" x2="150" y2="200" stroke="#aaaa4455" stroke-width="1.5" stroke-dasharray="4"/>
+                    <line x1="350" y1="140" x2="550" y2="200" stroke="#4488cc55" stroke-width="1.5" stroke-dasharray="4"/>
+
+                    <!-- Labels -->
+                    <text x="220" y="175" text-anchor="middle" fill="#888" font-size="10">mask = 1</text>
+                    <text x="480" y="175" text-anchor="middle" fill="#888" font-size="10">mask = 2</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- COLLISION LAYERS -->
+        <h2>2. Collision Layers</h2>
+        <div class="section">
+            <p>Godot использует битовые маски для определения столкновений. Каждый объект имеет <code>collision_layer</code> (где он находится) и <code>collision_mask</code> (с чем проверяет столкновения).</p>
+            
+            <table>
+                <tr><th>Layer</th><th>Назначение</th><th>Объекты</th></tr>
+                <tr>
+                    <td><span class="badge badge-layer">1</span></td>
+                    <td>Пол / статичные объекты</td>
+                    <td>Floor, Border</td>
+                </tr>
+                <tr>
+                    <td><span class="badge badge-layer">2</span></td>
+                    <td>Платформы (односторонние)</td>
+                    <td>Platform (все платформы)</td>
+                </tr>
+            </table>
+
+            <h3>Настройка врагов</h3>
+            <div class="code-block">
+<span class="cmt"># Enemy.tscn</span><br>
+collision_layer = <span class="num">2</span>  <span class="cmt"># Враг на layer 2</span><br>
+collision_mask = <span class="num">3</span>   <span class="cmt"># Столкновения с layer 1 + 2</span>
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Важно</div>
+                Если у врага <code>collision_mask = 1</code>, он не будет коллизиться с платформами (layer 2). Всегда проверяй mask!
+            </div>
+        </div>
+
+        <!-- ONE-WAY COLLISION -->
+        <h2>3. Односторонние платформы</h2>
+        <div class="section">
+            <p>Платформы используют <code>one_way_collision = true</code>. Это значит:</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Снизу вверх</div>
+                    <div class="card-desc">Можно прыгнуть сквозь платформу. Тело проходит насквозь и встает сверху.</div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Сверху вниз</div>
+                    <div class="card-desc">Нельзя пройти сквозь платформу. Тело стоит на ней как на полу.</div>
+                </div>
+            </div>
+
+            <h3>Platform.tscn</h3>
+            <div class="code-block">
+[node name=<span class="str">"Platform"</span> type=<span class="str">"StaticBody2D"</span> groups=[<span class="str">"platforms"</span>]]<br>
+collision_layer = <span class="num">2</span><br>
+collision_mask = <span class="num">1</span><br>
+<br>
+[node name=<span class="str">"CollisionShape2D"</span> type=<span class="str">"CollisionShape2D"</span> parent=<span class="str">"."</span>]<br>
+shape = SubResource(<span class="str">"RectangleShape2D_xxx"</span>)<br>
+one_way_collision = <span class="kw">true</span>  <span class="cmt"># Ключевая настройка!</span>
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">💡 Совет</div>
+                Односторонние платформы автоматически пропускают тела снизу. Но если нужно провалиться сверху — нужна дополнительная логика (см. раздел 4).
+            </div>
+        </div>
+
+        <!-- DROP-THROUGH MECHANIC -->
+        <h2>4. Проваливание сквозь платформы</h2>
+        <div class="section highlight">
+            <p>Механика "drop-through" — игрок нажимает вниз и проваливается сквозь платформу. Используется во многих платформерах.</p>
+
+            <div class="flow">
+                <div class="flow-step">1. Игрок на платформе</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">2. Нажал key_down</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">3. Отключаем collision с layer 2</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">4. Игрок проваливается</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">5. Через 0.2с включаем обратно</div>
+            </div>
+
+            <h3>Реализация в player_movement.gd</h3>
+            <div class="code-block">
+<span class="kw">const</span> DROP_DURATION : <span class="type">float</span> = <span class="num">0.2</span><br>
+<span class="kw">const</span> PLATFORM_LAYER : <span class="type">int</span> = <span class="num">2</span><br>
+<br>
+<span class="kw">var</span> is_dropping : <span class="type">bool</span> = <span class="kw">false</span><br>
+<span class="kw">var</span> drop_timer : <span class="type">float</span> = <span class="num">0.0</span><br>
+<br>
+<span class="kw">func</span> <span class="fn">_physics_process</span>(delta: <span class="type">float</span>) -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># ... горизонтальное движение ...</span><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> not controller.is_on_floor():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;controller.velocity.y += controller.gravity * delta<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">elif</span> Input.is_action_just_pressed(<span class="str">"key_down"</span>) and <span class="fn">_is_on_platform</span>():<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_start_drop</span>()  <span class="cmt"># Начинаем проваливание</span><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> is_dropping:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;drop_timer -= delta<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> drop_timer <= <span class="num">0</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_end_drop</span>()  <span class="cmt"># Включаем коллизию обратно</span><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;controller.move_and_slide()
+            </div>
+
+            <h3>Проверка — стоит ли на платформе</h3>
+            <div class="code-block">
+<span class="kw">func</span> <span class="fn">_is_on_platform</span>() -> <span class="type">bool</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> i <span class="kw">in</span> range(controller.get_slide_collision_count()):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> collision = controller.get_slide_collision(i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> collider = collision.get_collider()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> collider.is_in_group(<span class="str">"platforms"</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return false</span>
+            </div>
+
+            <h3>Включение/отключение коллизии</h3>
+            <div class="code-block">
+<span class="kw">func</span> <span class="fn">_start_drop</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is_dropping = <span class="kw">true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;drop_timer = DROP_DURATION<br>
+&nbsp;&nbsp;&nbsp;&nbsp;controller.set_collision_mask_value(PLATFORM_LAYER, <span class="kw">false</span>)<br>
+<br>
+<span class="kw">func</span> <span class="fn">_end_drop</span>() -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;is_dropping = <span class="kw">false</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;controller.set_collision_mask_value(PLATFORM_LAYER, <span class="kw">true</span>)
+            </div>
+
+            <div class="warning">
+                <div class="warning-title">⚠️ Почему не через пол?</div>
+                Пол <strong>не</strong> находится в группе <code>"platforms"</code>. Поэтому проверка <code>_is_on_platform()</code> вернет <code>false</code>, если игрок стоит на полу. Провалиться через пол невозможно.
+            </div>
+        </div>
+
+        <!-- ENEMY DROP-THROUGH -->
+        <h2>5. Враги и платформы</h2>
+        <div class="section">
+            <p>Враги тоже проваливаются сквозь платформы, когда преследуют игрока на той же платформе.</p>
+
+            <h3>Логика в chase_state.gd</h3>
+            <div class="code-block">
+<span class="kw">func</span> <span class="fn">physics_process</span>(delta : <span class="type">float</span>) -> <span class="type">void</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># ... погоня за целью ...</span><br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># Если враг на платформе И игрок ниже — проваливаемся</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> enemy.is_on_floor() and <span class="fn">_is_on_platform</span>() and <span class="fn">_is_on_same_platform</span>() and to_target.y > <span class="num">20</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">_start_drop</span>()
+            </div>
+
+            <h3>Проверки</h3>
+            <div class="code-block">
+<span class="kw">func</span> <span class="fn">_is_on_platform</span>() -> <span class="type">bool</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">for</span> i <span class="kw">in</span> range(enemy.get_slide_collision_count()):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> collision = enemy.get_slide_collision(i)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">var</span> collider = collision.get_collider()<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> collider.is_in_group(<span class="str">"platforms"</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return true</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return false</span><br>
+<br>
+<span class="kw">func</span> <span class="fn">_is_on_same_platform</span>() -> <span class="type">bool</span>:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> not enemy.target:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return false</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">return</span> enemy.target.global_position.y > enemy.global_position.y
+            </div>
+
+            <div class="tip">
+                <div class="tip-title">💡 Как работает</div>
+                Враг проверяет: "Я на платформе?" + "Игрок ниже меня?". Если оба условия выполнены — враг проваливается, чтобы преследовать игрока. Расстояние > 20px чтобы не проваливаться сразу.
+            </div>
+        </div>
+
+        <!-- GROUPS -->
+        <h2>6. Группа "platforms"</h2>
+        <div class="section">
+            <p>Все платформы добавлены в группу <code>"platforms"</code>. Это позволяет:</p>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-title">Определять платформы</div>
+                    <div class="card-desc">Функция <code>_is_on_platform()</code> проверяет группу через <code>is_in_group("platforms")</code></div>
+                </div>
+                <div class="card">
+                    <div class="card-title">Исключать пол</div>
+                    <div class="card-desc">Пол не в группе "platforms", поэтому через него нельзя провалиться</div>
+                </div>
+            </div>
+
+            <h3>Добавление в группу</h3>
+            <div class="code-block">
+<span class="cmt"># В Scene Tree: ПКМ на ноде → Add to Group → "platforms"</span><br>
+<span class="cmt"># Или в коде:</span><br>
+add_to_group(<span class="str">"platforms"</span>)
+            </div>
+        </div>
+
+        <!-- FILE STRUCTURE -->
+        <h2>7. Структура файлов</h2>
+        <div class="section">
+            <div class="tree">
+                <span class="folder">Scripts/Player/</span><br>
+                ├── <span class="file-gd">player_controller.gd</span> <span class="comment">— базовый класс, экспорты</span><br>
+                └── <span class="file-gd">player_movement.gd</span> <span class="comment">— движение + drop-through</span><br>
+                <br>
+                <span class="folder">Scripts/Enemies/States/</span><br>
+                └── <span class="file-gd">chase_state.gd</span> <span class="comment">— погоня + drop-through для врагов</span><br>
+                <br>
+                <span class="folder">Resources/Prefabs/</span><br>
+                ├── <span class="file-tscn">Platform.tscn</span> <span class="comment">— префаб платформы</span><br>
+                └── <span class="file-tscn">Enemy.tscn</span> <span class="comment">— collision_mask = 3</span><br>
+                <br>
+                <span class="folder">Scenes/</span><br>
+                └── <span class="file-tscn">World.tscn</span> <span class="comment">— сцена с Floor + Platforms</span>
+            </div>
+        </div>
+
+        <!-- SUMMARY -->
+        <h2>8. Итого</h2>
+        <div class="section">
+            <table>
+                <tr><th>Компонент</th><th>Layer</th><th>Mask</th><th>Группа</th><th>Особенность</th></tr>
+                <tr>
+                    <td>Floor</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>—</td>
+                    <td>Обычная коллизия, без one-way</td>
+                </tr>
+                <tr>
+                    <td>Platform</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td><span class="badge badge-group">platforms</span></td>
+                    <td>one_way_collision = true</td>
+                </tr>
+                <tr>
+                    <td>Player</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>—</td>
+                    <td>Drop-through по key_down</td>
+                </tr>
+                <tr>
+                    <td>Enemy</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>—</td>
+                    <td>Drop-through при погоне</td>
+                </tr>
+            </table>
+        </div>
+
+        <p style="text-align:center; color:#444; margin-top:40px; font-size:0.9em;">Layer Defence — Platform System Documentation</p>
+    </div>
+</body>
+</html>
