@@ -4,18 +4,17 @@
 [ext_resource type="Texture2D" uid="uid://cl5ppak5kmji4" path="res://Aseprites/Debug/Weapon_Wave.png" id="1_gum5i"]
 
 [sub_resource type="Animation" id="Animation_gum5i"]
-length = 0.001
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Sprite2D:texture")
+tracks/0/path = NodePath("Sprite2D:scale")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 1,
-"values": [ExtResource("1_gum5i")]
+"times": PackedFloat32Array(0, 0.8, 1),
+"transitions": PackedFloat32Array(1, 1, 0.1339719),
+"update": 0,
+"values": [Vector2(1, 1), Vector2(0.85, 0.85), Vector2(0, 0)]
 }
 
 [sub_resource type="Animation" id="Animation_6jt38"]
@@ -41,7 +40,6 @@ _data = {
 
 [node name="WeaponWave" type="StaticBody2D" unique_id=540317355]
 script = ExtResource("1_6jt38")
-move_speed = null
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=596941728]
 texture = ExtResource("1_gum5i")
@@ -50,3 +48,4 @@ texture = ExtResource("1_gum5i")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1071360432]
 libraries/ = SubResource("AnimationLibrary_ut7as")
+autoplay = &"RESET"

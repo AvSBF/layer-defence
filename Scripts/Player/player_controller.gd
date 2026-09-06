@@ -12,7 +12,7 @@ extends CharacterBody2D
 func _unhandled_input(event: InputEvent) -> void:
 	_correct_turn()
 	if event.is_action_pressed("attack"):
-		attack_controller.attack()
+		attack_controller.attack_with_direction((get_global_mouse_position() - global_position).normalized())
 
 func _correct_turn():
 	if velocity.x > 0:

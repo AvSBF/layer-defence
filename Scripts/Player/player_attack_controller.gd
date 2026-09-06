@@ -9,6 +9,13 @@ var is_attacking = false
 func _ready() -> void:
 	weapon_animation.animation_finished.connect(_on_animation_finished)
 
+func attack_with_direction(click_direction : Vector2):
+	if is_attacking:
+		return
+	weapon_animation.play("SwordSwingAnimation")
+	is_attacking = true
+	_spawn_wave(click_direction)
+
 func attack():
 	if is_attacking:
 		return
@@ -19,11 +26,10 @@ func attack():
 func _on_animation_finished():
 	is_attacking = false
 
-func _spawn_wave():
+func _spawn_wave(direction : Vector2 = Vector2.RIGHT) -> Node2D:
 	var wave_instance = weapon_wave.instantiate()
 	var weapon_position : Vector2 = $"../Weapon".global_position
-	var player : Node = get_parent()
-	var is_left : bool = player.get_meta("looking_left") if player.has_meta("looking_left") else false
 	wave_instance.global_position = weapon_position
-	wave_instance.set_direction(is_left)
-	player.get_parent().add_child(wave_instance)
+	wave_instance.set_direction(direction)
+	get_parent().get_parent().add_child(wave_instance)
+	return wave_instance

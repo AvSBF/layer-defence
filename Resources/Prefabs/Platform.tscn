@@ -8,6 +8,7 @@ collision_layer = 2
 collision_mask = 1
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=1856586483]
+mouse_filter = 2
 z_index = -1
 offset_left = -100.0
 offset_top = -10.0
