@@ -7,6 +7,8 @@
 [ext_resource type="Script" uid="uid://b4xhwyp4ts64n" path="res://Scenes/world_camera_smoothing.gd" id="5_p70al"]
 [ext_resource type="Script" uid="uid://doc1oo7ol18cf" path="res://Scripts/Spawners/wave_spawner.gd" id="6_spawner"]
 [ext_resource type="Script" uid="uid://cabqy8p7cm0l4" path="res://Scripts/Spawners/spawn_area.gd" id="7_area"]
+[ext_resource type="Script" uid="uid://dws4kdbdrg8vw" path="res://Scripts/Spawners/enemy_wave.gd" id="7_ti1bm"]
+[ext_resource type="Resource" uid="uid://c80d6t3lmspff" path="res://Resources/Spawners/wave_1.tres" id="8_op4cu"]
 [ext_resource type="Script" uid="uid://153y2wxf1x7d" path="res://Scripts/Spawners/spawn_point.gd" id="8_point"]
 [ext_resource type="Script" uid="uid://cofk61bgusjo5" path="res://Scripts/cursor_position.gd" id="9_kn06e"]
 [ext_resource type="Texture2D" uid="uid://e7d40cprgtsn" path="res://Aseprites/Debug/Cursor.png" id="9_uo7di"]
@@ -22,11 +24,11 @@ max_jump_hold = 0.4
 position = Vector2(0, 191)
 
 [node name="ColorRect" type="ColorRect" parent="Floor" unique_id=54723674]
-mouse_filter = 2
 offset_left = -2000.0
 offset_top = -152.0
 offset_right = 2000.0
 offset_bottom = 148.0
+mouse_filter = 2
 color = Color(0.23753911, 0.23753914, 0.23753908, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=29822633]
@@ -63,7 +65,6 @@ position = Vector2(1500, -709)
 scale = Vector2(1, 5)
 
 [node name="borderColor" type="ColorRect" parent="Borders/Border" unique_id=128847484]
-mouse_filter = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -75,6 +76,7 @@ offset_right = 50.0
 offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.32511863, 0.04106886, 0.08800968, 1)
 
 [node name="borderCollision" type="CollisionShape2D" parent="Borders/Border" unique_id=197682682]
@@ -86,7 +88,6 @@ position = Vector2(-1500, -709)
 scale = Vector2(1, 5)
 
 [node name="borderColor" type="ColorRect" parent="Borders/Border2" unique_id=488421897]
-mouse_filter = 2
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -98,6 +99,7 @@ offset_right = 50.0
 offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 color = Color(0.32511863, 0.04106886, 0.08800968, 1)
 
 [node name="borderCollision" type="CollisionShape2D" parent="Borders/Border2" unique_id=761424936]
@@ -116,6 +118,7 @@ script = ExtResource("5_p70al")
 
 [node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "spawn_points")]
 script = ExtResource("6_spawner")
+waves = Array[ExtResource("7_ti1bm")]([ExtResource("8_op4cu")])
 target = NodePath("../../Player")
 spawn_areas = [NodePath("../LeftArea"), NodePath("../RightArea")]
 spawn_points = NodePath("../RegularSpawnPoints")

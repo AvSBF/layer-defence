@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Collision Layers & Masks — Layer Defence</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0a0f; color: #e0e0e0; line-height: 1.6; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2.2em; margin-bottom: 10px; background: linear-gradient(135deg, #44aaff, #aa66ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 1.5em; margin: 40px 0 20px; color: #44aaff; border-bottom: 2px solid #44aaff33; padding-bottom: 8px; }
+        h3 { font-size: 1.1em; color: #aa66ff; margin: 20px 0 10px; }
+        p { color: #aaa; margin-bottom: 15px; }
+        .subtitle { color: #666; font-size: 1.1em; margin-bottom: 30px; }
+
+        .section { background: #12121a; border-radius: 12px; padding: 30px; margin: 25px 0; border: 1px solid #222; }
+        .section.highlight { border-color: #44aaff55; }
+
+        .code-block { background: #0d0d14; padding: 16px 20px; border-radius: 8px; font-family: 'Cascadia Code', monospace; font-size: 13px; line-height: 1.7; overflow-x: auto; margin: 15px 0; border: 1px solid #1a1a25; }
+        .code-block .kw { color: #cc66ff; }
+        .code-block .type { color: #44aaff; }
+        .code-block .str { color: #aadd77; }
+        .code-block .num { color: #ffaa44; }
+        .code-block .cmt { color: #555; font-style: italic; }
+        .code-block .fn { color: #ffcc44; }
+        .code-block .var { color: #ff8866; }
+
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th { text-align: left; padding: 10px; background: #1a1a25; color: #aa66ff; font-weight: 600; }
+        td { padding: 10px; border-top: 1px solid #1a1a25; }
+        tr:hover td { background: #14141c; }
+
+        .bit-mask { display: flex; gap: 3px; margin: 8px 0; }
+        .bit { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 6px; font-family: monospace; font-weight: 700; font-size: 0.85em; }
+        .bit-on { background: #225533; color: #44cc77; border: 1px solid #337744; }
+        .bit-off { background: #1a1a1a; color: #444; border: 1px solid #222; }
+        .bit-label { font-size: 0.7em; color: #555; text-align: center; margin-top: 2px; }
+        .bit-group { text-align: center; }
+
+        .flow { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
+        .flow-step { background: #1a1a25; padding: 10px 18px; border-radius: 8px; border: 1px solid #2a2a35; font-size: 0.9em; }
+        .flow-arrow { color: #44aaff; font-size: 1.2em; }
+
+        .entity-card { background: #1a1a25; border-radius: 12px; padding: 24px; margin: 20px 0; border: 1px solid #2a2a35; }
+        .entity-card:hover { border-color: #44aaff66; }
+        .entity-name { font-size: 1.2em; color: #44aaff; font-weight: 700; margin-bottom: 4px; }
+        .entity-type { color: #666; font-size: 0.85em; margin-bottom: 12px; }
+        .entity-props { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
+        .entity-prop { background: #0d0d14; padding: 10px 14px; border-radius: 8px; }
+        .entity-prop-label { color: #666; font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; }
+        .entity-prop-val { color: #e0e0e0; font-size: 1.1em; font-weight: 600; margin-top: 2px; }
+        .entity-prop-val.accent { color: #44cc77; }
+
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.75em; font-weight: 600; margin-left: 6px; }
+        .badge-green { background: #225533; color: #44cc77; }
+        .badge-blue { background: #223355; color: #44aaff; }
+        .badge-red { background: #553322; color: #ff6644; }
+        .badge-purple { background: #332255; color: #aa66ff; }
+
+        .diagram { text-align: center; padding: 30px; background: #0d0d14; border-radius: 10px; margin: 20px 0; overflow-x: auto; }
+
+        .note { background: #1a1a14; border-left: 3px solid #ffaa44; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 15px 0; font-size: 0.9em; }
+        .note strong { color: #ffaa44; }
+
+        .warn { background: #1a1414; border-left: 3px solid #ff4444; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 15px 0; font-size: 0.9em; }
+        .warn strong { color: #ff4444; }
+
+        .layer-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 8px; margin: 20px 0; }
+        .layer-cell { background: #0d0d14; border: 1px solid #222; border-radius: 8px; padding: 12px 8px; text-align: center; transition: border-color 0.3s; }
+        .layer-cell:hover { border-color: #44aaff66; }
+        .layer-cell.active { border-color: #44cc77; background: #0d140d; }
+        .layer-num { font-size: 1.4em; font-weight: 700; color: #444; }
+        .layer-cell.active .layer-num { color: #44cc77; }
+        .layer-use { font-size: 0.7em; color: #555; margin-top: 4px; }
+        .layer-cell.active .layer-use { color: #888; }
+
+        .tree { font-family: 'Cascadia Code', monospace; background: #0d0d14; padding: 20px; border-radius: 8px; font-size: 13px; line-height: 1.8; overflow-x: auto; }
+        .tree .folder { color: #ffaa44; }
+        .tree .file-gd { color: #66aaff; }
+        .tree .file-tscn { color: #ff88aa; }
+        .tree .comment { color: #555; font-style: italic; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Collision Layers & Masks</h1>
+        <p class="subtitle">Полная карта физических слоёв, масок столкновений и динамического переключения в проекте Layer Defence</p>
+
+        <!-- 1. LAYER MAP -->
+        <h2>1. Карта слоёв (Physics Layers)</h2>
+        <div class="section highlight">
+            <p>Проект использует стандартную 2D-физику Godot. Слои нумеруются от 1 до 32 (биты маски). В проекте задействованы только <strong>Layer 1</strong> и <strong>Layer 2</strong>.</p>
+            <div class="layer-grid">
+                <div class="layer-cell active">
+                    <div class="layer-num">1</div>
+                    <div class="layer-use">Floor / Static</div>
+                </div>
+                <div class="layer-cell active">
+                    <div class="layer-num">2</div>
+                    <div class="layer-use">Platform</div>
+                </div>
+                <div class="layer-cell"><div class="layer-num">3</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">4</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">5</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">6</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">7</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">8</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">9</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">10</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">11</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">12</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">13</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">14</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">15</div><div class="layer-use">—</div></div>
+                <div class="layer-cell"><div class="layer-num">16</div><div class="layer-use">—</div></div>
+            </div>
+            <div class="note">
+                <strong>Примечание:</strong> project.godot не содержит секции <code>[layer_names]</code> — имена слоёв не кастомизированы, используются дефолтные.
+            </div>
+        </div>
+
+        <!-- 2. BITMASK VISUALIZATION -->
+        <h2>2. Визуализация битовых масок</h2>
+        <div class="section">
+            <p>Каждый <code>collision_mask</code> и <code>collision_layer</code> — это битовая маска. Значение <code>3</code> = <code>0b11</code> = слои 1+2.</p>
+
+            <h3>collision_mask (с чем сталкивается)</h3>
+            <table>
+                <tr><th>Объект</th><th>Значение</th><th>Биты</th><th>Layer 1</th><th>Layer 2</th></tr>
+                <tr>
+                    <td>Player</td>
+                    <td><code>3</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-green">ON</span></td>
+                </tr>
+                <tr>
+                    <td>Platform</td>
+                    <td><code>1</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                </tr>
+                <tr>
+                    <td>Enemy</td>
+                    <td><code>3</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-green">ON</span></td>
+                </tr>
+                <tr>
+                    <td>WeaponWave</td>
+                    <td><code>3</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-green">ON</span></td>
+                </tr>
+            </table>
+
+            <h3>collision_layer (кем является объект)</h3>
+            <table>
+                <tr><th>Объект</th><th>Значение</th><th>Биты</th><th>Layer 1</th><th>Layer 2</th></tr>
+                <tr>
+                    <td>Floor</td>
+                    <td><code>1</code> (дефолт)</td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                </tr>
+                <tr>
+                    <td>Platform</td>
+                    <td><code>2</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                    <td><span class="badge badge-green">ON</span></td>
+                </tr>
+                <tr>
+                    <td>Player</td>
+                    <td><code>1</code> (дефолт)</td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                </tr>
+                <tr>
+                    <td>Enemy</td>
+                    <td><code>2</code></td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                    <td><span class="badge badge-green">ON</span></td>
+                </tr>
+                <tr>
+                    <td>WeaponWave</td>
+                    <td><code>1</code> (дефолт)</td>
+                    <td>
+                        <div class="bit-mask">
+                            <div class="bit-group"><div class="bit bit-on">1</div><div class="bit-label">bit 1</div></div>
+                            <div class="bit-group"><div class="bit bit-off">0</div><div class="bit-label">bit 2</div></div>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-green">ON</span></td>
+                    <td><span class="badge badge-red">OFF</span></td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 3. ENTITY DETAILS -->
+        <h2>3. Детализация по объектам</h2>
+
+        <div class="entity-card">
+            <div class="entity-name">Floor</div>
+            <div class="entity-type">StaticBody2D — статичная основа уровня</div>
+            <div class="entity-props">
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_layer</div>
+                    <div class="entity-prop-val">1 <span class="badge badge-blue">дефолт</span></div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_mask</div>
+                    <div class="entity-prop-val">1 <span class="badge badge-blue">дефолт</span></div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">one_way</div>
+                    <div class="entity-prop-val">Нет</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Группа</div>
+                    <div class="entity-prop-val">—</div>
+                </div>
+            </div>
+            <div class="note"><strong>Где определён:</strong> Floor создаётся на сцене как StaticBody2D с CollisionShape2D. collision_layer и collision_mask не заданы явно — используются дефолтные значения Godot (1 / 1).</div>
+        </div>
+
+        <div class="entity-card">
+            <div class="entity-name">Platform</div>
+            <div class="entity-type">StaticBody2D — однонаправленная платформа</div>
+            <div class="entity-props">
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_layer</div>
+                    <div class="entity-prop-val accent">2</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_mask</div>
+                    <div class="entity-prop-val">1</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">one_way</div>
+                    <div class="entity-prop-val accent">Да</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Группа</div>
+                    <div class="entity-prop-val">"platforms"</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="cmt">// Resources/Prefabs/Platform.tscn</span><br>
+<span class="type">Platform</span> <span class="kw">extends</span> <span class="type">StaticBody2D</span><br>
+&nbsp;&nbsp;collision_layer = <span class="num">2</span>   <span class="cmt"># живёт на слое 2 (Platform)</span><br>
+&nbsp;&nbsp;collision_mask = <span class="num">1</span>    <span class="cmt"># сталкивается только с Layer 1 (Floor)</span><br>
+&nbsp;&nbsp;one_way_collision = <span class="num">true</span>  <span class="cmt"># проходим снизу, сталкиваемся сверху</span>
+            </div>
+            <div class="warn"><strong>Важно:</strong> Platform не сталкивается с другими платформами (mask=1), только с полом. Игрок и враги сталкиваются с платформами через свою маску.</div>
+        </div>
+
+        <div class="entity-card">
+            <div class="entity-name">Player</div>
+            <div class="entity-type">CharacterBody2D — управляемый персонаж</div>
+            <div class="entity-props">
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_layer</div>
+                    <div class="entity-prop-val">1 <span class="badge badge-blue">дефолт</span></div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_mask</div>
+                    <div class="entity-prop-val accent">3 (= 1+2)</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">one_way</div>
+                    <div class="entity-prop-val">Нет</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Drop-through</div>
+                    <div class="entity-prop-val accent">Да (через код)</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="cmt">// Scripts/Player/player_movement.gd</span><br>
+<span class="kw">const</span> <span class="var">PLATFORM_LAYER</span>: <span class="type">int</span> = <span class="num">2</span><br>
+<br>
+<span class="cmt"># Drop-through: отключаем маску слоя 2</span><br>
+controller.<span class="fn">set_collision_mask_value</span>(<span class="var">PLATFORM_LAYER</span>, <span class="num">false</span>)<br>
+<span class="cmt"># ...await timer...</span><br>
+<span class="cmt"># Включаем обратно</span><br>
+controller.<span class="fn">set_collision_mask_value</span>(<span class="var">PLATFORM_LAYER</span>, <span class="num">true</span>)
+            </div>
+            <div class="note"><strong>Как работает drop-through:</strong> При нажатии вниз + прыжок Player временно отключает collision_mask для слоя 2, проваливаясь сквозь платформу. Через небольшую задержку маска восстанавливается.</div>
+        </div>
+
+        <div class="entity-card">
+            <div class="entity-name">Enemy</div>
+            <div class="entity-type">CharacterBody2D — вражеский юнит</div>
+            <div class="entity-props">
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_layer</div>
+                    <div class="entity-prop-val accent">2</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_mask</div>
+                    <div class="entity-prop-val accent">3 (= 1+2)</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">one_way</div>
+                    <div class="entity-prop-val">Нет</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Группа</div>
+                    <div class="entity-prop-val">"Enemy" + "enemy"</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Drop-through</div>
+                    <div class="entity-prop-val accent">Да (через код)</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="cmt">// Resources/Prefabs/Enemy/Enemy.tscn</span><br>
+<span class="type">Enemy</span> <span class="kw">extends</span> <span class="type">CharacterBody2D</span><br>
+&nbsp;&nbsp;collision_layer = <span class="num">2</span>   <span class="cmt"># живёт на слое 2 (Platform)</span><br>
+&nbsp;&nbsp;collision_mask = <span class="num">3</span>    <span class="cmt"># сталкивается с Layer 1 + Layer 2</span><br>
+<br>
+<span class="cmt">// Scripts/Enemies/States/chase_state.gd</span><br>
+<span class="kw">const</span> <span class="var">PLATFORM_LAYER</span>: <span class="type">int</span> = <span class="num">2</span><br>
+<br>
+<span class="cmt"># Враг падает сквозь платформы</span><br>
+enemy.<span class="fn">set_collision_mask_value</span>(<span class="var">PLATFORM_LAYER</span>, <span class="num">false</span>)<br>
+<span class="cmt"># ...в конце состояния...</span><br>
+enemy.<span class="fn">set_collision_mask_value</span>(<span class="var">PLATFORM_LAYER</span>, <span class="num">true</span>)
+            </div>
+            <div class="warn"><strong>Особенность:</strong> Enemy имеет collision_layer=2 (тот же слой, что и Platform). Это означает, что Enemy <em>не сталкивается</em> с другими врагами (их маски не пересекаются с layer 2 через mask). Враг добавляет себя в группу "enemy" в runtime.</div>
+        </div>
+
+        <div class="entity-card">
+            <div class="entity-name">WeaponWave</div>
+            <div class="entity-type">Area2D — волна оружия (_area_)</div>
+            <div class="entity-props">
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_layer</div>
+                    <div class="entity-prop-val">1 <span class="badge badge-blue">дефолт</span></div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">collision_mask</div>
+                    <div class="entity-prop-val accent">3 (= 1+2)</div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Тип</div>
+                    <div class="entity-prop-val">Area2D <span class="badge badge-purple">не PhysicsBody</span></div>
+                </div>
+                <div class="entity-prop">
+                    <div class="entity-prop-label">Детекция</div>
+                    <div class="entity-prop-val">get_overlapping_bodies()</div>
+                </div>
+            </div>
+            <div class="code-block">
+<span class="cmt">// Scripts/Weapons/weapon_wave_controller.gd</span><br>
+<span class="cmt"># Area2D не сталкивается физически, а только детектит</span><br>
+<span class="kw">var</span> <span class="var">bodies</span> = <span class="fn">get_overlapping_bodies</span>()<br>
+<span class="kw">for</span> <span class="var">body</span> <span class="kw">in</span> <span class="var">bodies</span>:<br>
+&nbsp;&nbsp;<span class="kw">if</span> <span class="var">body</span>.is_in_group(<span class="str">"Enemy"</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="cmt"># нанести урон</span>
+            </div>
+            <div class="note"><strong>Mask=3</strong> означает, что WeaponWave детектит и Floor (Layer 1), и Platform/Enemy (Layer 2). В коде фильтруется по группе "Enemy".</div>
+        </div>
+
+        <!-- 4. DYNAMIC TOGGLING -->
+        <h2>4. Динамическое переключение слоёв</h2>
+        <div class="section">
+            <p>Проект использует <code>set_collision_mask_value()</code> для временного отключения/включения столкновений. Это ключевой механик drop-through платформ.</p>
+
+            <h3>Player — drop-through платформы</h3>
+            <div class="flow">
+                <div class="flow-step">Вниз + Прыжок</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">set_collision_mask_value(2, false)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">Player проваливается</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">await (таймер)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">set_collision_mask_value(2, true)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">Столкновения восстановлены</div>
+            </div>
+
+            <h3>Enemy — падение сквозь платформы</h3>
+            <div class="flow">
+                <div class="flow-step"> chase_state.gd: _enter()</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">set_collision_mask_value(2, false)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">Враг падает сквозь платформы</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">Обнаружен collision с Floor</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">set_collision_mask_value(2, true)</div>
+                <span class="flow-arrow">→</span>
+                <div class="flow-step">Столкновения восстановлены</div>
+            </div>
+
+            <h3>Все вызовы set_collision_mask_value</h3>
+            <table>
+                <tr><th>Файл</th><th>Строка</th><th>Вызов</th><th>Эффект</th></tr>
+                <tr>
+                    <td><code>player_movement.gd</code></td>
+                    <td>44</td>
+                    <td><code>set_collision_mask_value(2, false)</code></td>
+                    <td>Отключить столкновения с платформами</td>
+                </tr>
+                <tr>
+                    <td><code>player_movement.gd</code></td>
+                    <td>48</td>
+                    <td><code>set_collision_mask_value(2, true)</code></td>
+                    <td>Включить столкновения с платформами</td>
+                </tr>
+                <tr>
+                    <td><code>chase_state.gd</code></td>
+                    <td>75</td>
+                    <td><code>set_collision_mask_value(2, false)</code></td>
+                    <td>Враг падает сквозь платформы</td>
+                </tr>
+                <tr>
+                    <td><code>chase_state.gd</code></td>
+                    <td>23</td>
+                    <td><code>set_collision_mask_value(2, true)</code></td>
+                    <td>Восстановить столкновения врага</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 5. COLLISION DETECTION -->
+        <h2>5. Методы обнаружения столкновений</h2>
+        <div class="section">
+            <table>
+                <tr><th>Метод</th><th>Тип объекта</th><th>Где используется</th><th>Назначение</th></tr>
+                <tr>
+                    <td><code>move_and_slide()</code></td>
+                    <td>CharacterBody2D</td>
+                    <td>player_movement.gd:31, enemy.gd:44</td>
+                    <td>Физическое перемещение с обработкой столкновений</td>
+                </tr>
+                <tr>
+                    <td><code>get_slide_collision_count()</code></td>
+                    <td>CharacterBody2D</td>
+                    <td>player_movement.gd:34, chase_state.gd:60</td>
+                    <td>Количество столкновений за кадр</td>
+                </tr>
+                <tr>
+                    <td><code>get_slide_collision(i)</code></td>
+                    <td>CharacterBody2D</td>
+                    <td>player_movement.gd:35, chase_state.gd:61</td>
+                    <td>Получить конкретное столкновение по индексу</td>
+                </tr>
+                <tr>
+                    <td><code>get_collider()</code></td>
+                    <td>KinematicCollision2D</td>
+                    <td>player_movement.gd:36, chase_state.gd:62</td>
+                    <td>Получить объект, с которым столкнулись</td>
+                </tr>
+                <tr>
+                    <td><code>is_in_group()</code></td>
+                    <td>Node</td>
+                    <td>player_movement.gd:37, chase_state.gd:63</td>
+                    <td>Проверить принадлежность к группе ("platforms")</td>
+                </tr>
+                <tr>
+                    <td><code>get_overlapping_bodies()</code></td>
+                    <td>Area2D</td>
+                    <td>weapon_wave_controller.gd:28</td>
+                    <td>Получить все физические тела в зоне Area2D</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 6. GROUPS -->
+        <h2>6. Группы объектов</h2>
+        <div class="section">
+            <p>Группы используются для дополнительной фильтрации при обнаружении столкновений.</p>
+            <table>
+                <tr><th>Группа</th><th>Объекты</th><th>Где определена</th><th>Как используется</th></tr>
+                <tr>
+                    <td><code>"platforms"</code></td>
+                    <td>Platform</td>
+                    <td>Platform.tscn (автоматически)</td>
+                    <td>Player и Enemy проверяют <code>is_in_group("platforms")</code> при столкновении</td>
+                </tr>
+                <tr>
+                    <td><code>"Enemy"</code></td>
+                    <td>Enemy</td>
+                    <td>Enemy.tscn (автоматически)</td>
+                    <td>WeaponWave проверяет <code>is_in_group("Enemy")</code> для нанесения урона</td>
+                </tr>
+                <tr>
+                    <td><code>"enemy"</code></td>
+                    <td>Enemy</td>
+                    <td>enemy.gd:17 (<code>add_to_group()</code>)</td>
+                    <td>Добавляется в runtime</td>
+                </tr>
+                <tr>
+                    <td><code>"platform"</code></td>
+                    <td>—</td>
+                    <td>project.godot:25</td>
+                    <td>Глобальная группа (пустая)</td>
+                </tr>
+            </table>
+            <div class="note"><strong>Разница:</strong> "Enemy" (с большой буквы) определена в .tscn файле. "enemy" (с маленькой) добавляется вручную в скрипте. WeaponWave использует "Enemy".</div>
+        </div>
+
+        <!-- 7. SCENE FILES -->
+        <h2>7. Файлы сцен (.tscn)</h2>
+        <div class="section">
+            <div class="tree">
+                <span class="folder">Resources/</span><br>
+                ├── <span class="file-tscn">player.tscn</span> <span class="comment">— Player: collision_mask = 3</span><br>
+                ├── <span class="folder">Prefabs/</span><br>
+                │   ├── <span class="file-tscn">Platform.tscn</span> <span class="comment">— Platform: layer=2, mask=1, one_way=true</span><br>
+                │   ├── <span class="folder">Enemy/</span><br>
+                │   │   └── <span class="file-tscn">Enemy.tscn</span> <span class="comment">— Enemy: layer=2, mask=3</span><br>
+                │   └── <span class="folder">Weapons/</span><br>
+                │       └── <span class="file-tscn">weapon_wave.tscn</span> <span class="comment">— WeaponWave: mask=3</span><br>
+                <br>
+                <span class="folder">Scenes/</span><br>
+                └── <span class="file-tscn">World.tscn</span> <span class="comment">— Camera2D: light_mask=3 (не physics)</span>
+            </div>
+        </div>
+
+        <!-- 8. LIGHT MASK -->
+        <h2>8. Light Mask (Rendering)</h2>
+        <div class="section">
+            <p>Light Mask — это отдельная система от collision. Используется для рендеринга освещения.</p>
+            <table>
+                <tr><th>Объект</th><th>Сцена</th><th>light_mask</th><th>Назначение</th></tr>
+                <tr>
+                    <td>Camera2D</td>
+                    <td>World.tscn:110</td>
+                    <td><code>3</code></td>
+                    <td>Камера видит освещение на слоях 1+2</td>
+                </tr>
+            </table>
+            <div class="note"><strong>Не связано с физикой.</strong> light_mask влияет только на видимость света/тени в 2D-рендеринге.</div>
+        </div>
+
+        <!-- 9. SUMMARY TABLE -->
+        <h2>9. Сводная таблица</h2>
+        <div class="section highlight">
+            <table>
+                <tr>
+                    <th>Объект</th>
+                    <th>Тип</th>
+                    <th>Layer</th>
+                    <th>Mask</th>
+                    <th>one_way</th>
+                    <th>Группа</th>
+                    <th>Drop-through</th>
+                    <th>Файл</th>
+                </tr>
+                <tr>
+                    <td><strong>Floor</strong></td>
+                    <td>StaticBody2D</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>Нет</td>
+                    <td>—</td>
+                    <td>Нет</td>
+                    <td>Сцена</td>
+                </tr>
+                <tr>
+                    <td><strong>Platform</strong></td>
+                    <td>StaticBody2D</td>
+                    <td>2</td>
+                    <td>1</td>
+                    <td>Да</td>
+                    <td>"platforms"</td>
+                    <td>N/A</td>
+                    <td>Platform.tscn</td>
+                </tr>
+                <tr>
+                    <td><strong>Player</strong></td>
+                    <td>CharacterBody2D</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>Нет</td>
+                    <td>—</td>
+                    <td>Да</td>
+                    <td>player.tscn</td>
+                </tr>
+                <tr>
+                    <td><strong>Enemy</strong></td>
+                    <td>CharacterBody2D</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>Нет</td>
+                    <td>"Enemy"</td>
+                    <td>Да</td>
+                    <td>Enemy.tscn</td>
+                </tr>
+                <tr>
+                    <td><strong>WeaponWave</strong></td>
+                    <td>Area2D</td>
+                    <td>1</td>
+                    <td>3</td>
+                    <td>Нет</td>
+                    <td>—</td>
+                    <td>Нет</td>
+                    <td>weapon_wave.tscn</td>
+                </tr>
+            </table>
+
+            <h3>Какие слои кто видит</h3>
+            <div class="diagram">
+                <svg width="600" height="320" viewBox="0 0 600 320">
+                    <!-- Layer 1 box -->
+                    <rect x="20" y="20" width="260" height="280" rx="10" fill="#111" stroke="#44cc77" stroke-width="2"/>
+                    <text x="150" y="50" text-anchor="middle" fill="#44cc77" font-size="16" font-weight="bold">Layer 1 (Floor)</text>
+
+                    <!-- Layer 2 box -->
+                    <rect x="320" y="20" width="260" height="280" rx="10" fill="#111" stroke="#44aaff" stroke-width="2"/>
+                    <text x="450" y="50" text-anchor="middle" fill="#44aaff" font-size="16" font-weight="bold">Layer 2 (Platform)</text>
+
+                    <!-- Floor in L1 -->
+                    <rect x="40" y="70" width="220" height="40" rx="6" fill="#223322"/>
+                    <text x="150" y="96" text-anchor="middle" fill="#44cc77" font-size="13">Floor (Layer=1)</text>
+
+                    <!-- Platform in L2 -->
+                    <rect x="340" y="70" width="220" height="40" rx="6" fill="#222233"/>
+                    <text x="450" y="96" text-anchor="middle" fill="#44aaff" font-size="13">Platform (Layer=2)</text>
+
+                    <!-- Player mask arrow -->
+                    <rect x="40" y="140" width="220" height="40" rx="6" fill="#222233"/>
+                    <text x="150" y="166" text-anchor="middle" fill="#aa66ff" font-size="13">Player (Layer=1)</text>
+                    <line x1="260" y1="160" x2="340" y2="90" stroke="#aa66ff" stroke-width="2" stroke-dasharray="5,5"/>
+                    <text x="300" y="115" text-anchor="middle" fill="#aa66ff" font-size="10">mask=3 (1+2)</text>
+
+                    <!-- Enemy -->
+                    <rect x="340" y="140" width="220" height="40" rx="6" fill="#332222"/>
+                    <text x="450" y="166" text-anchor="middle" fill="#ff6644" font-size="13">Enemy (Layer=2)</text>
+
+                    <!-- WeaponWave -->
+                    <rect x="190" y="220" width="220" height="40" rx="6" fill="#222233"/>
+                    <text x="300" y="246" text-anchor="middle" fill="#ff88aa" font-size="13">WeaponWave (Layer=1, mask=3)</text>
+
+                    <!-- WeaponWave detection arrows -->
+                    <line x1="260" y1="230" x2="260" y2="110" stroke="#ff88aa" stroke-width="1.5" stroke-dasharray="4,4"/>
+                    <line x1="340" y1="230" x2="450" y2="180" stroke="#ff88aa" stroke-width="1.5" stroke-dasharray="4,4"/>
+                    <text x="245" y="200" text-anchor="middle" fill="#ff88aa" font-size="9">детект</text>
+                    <text x="400" y="210" text-anchor="middle" fill="#ff88aa" font-size="9">детект</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 10. PROJECT SETTINGS -->
+        <h2>10. Настройки проекта</h2>
+        <div class="section">
+            <div class="code-block">
+<span class="cmt">; project.godot</span><br>
+<br>
+[<span class="kw">group_settings</span>]<br>
+<span class="var">platform</span>=<span class="str">""</span>     <span class="cmt"># глобальная группа (пустая)</span><br>
+<span class="var">Enemy</span>=<span class="str">""</span>        <span class="cmt"># глобальная группа</span><br>
+<br>
+[<span class="kw">physics</span>]<br>
+<span class="var">3d/physics_engine</span>=<span class="str">"Jolt Physics"</span>  <span class="cmt"># 3D движок; 2D — дефолтный Godot</span><br>
+<br>
+<span class="cmt"># Нет секции [layer_names] — дефолтные имена слоёв</span>
+            </div>
+        </div>
+
+        <p style="text-align:center; color:#444; margin-top:40px; font-size:0.9em;">Layer Defence — Collision Layers & Masks Documentation</p>
+    </div>
+</body>
+</html>

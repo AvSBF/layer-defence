@@ -14,6 +14,7 @@ var dash_timer : float = 0.0
 var dash_direction : float = 0.0
 
 func _ready() -> void:
+	add_to_group("enemy")
 	speed_variation = randf_range(-25, 25)
 	if stats:
 		health_component.max_health = stats.max_hp

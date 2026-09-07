@@ -30,6 +30,6 @@ func _spawn_wave(direction : Vector2 = Vector2.RIGHT) -> Node2D:
 	var wave_instance = weapon_wave.instantiate()
 	var weapon_position : Vector2 = $"../Weapon".global_position
 	wave_instance.global_position = weapon_position
-	wave_instance.set_direction(direction)
 	get_parent().get_parent().add_child(wave_instance)
+	wave_instance.set_direction(direction)
 	return wave_instance

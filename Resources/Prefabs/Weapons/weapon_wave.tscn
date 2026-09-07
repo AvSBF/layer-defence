@@ -3,6 +3,9 @@
 [ext_resource type="Script" uid="uid://x85lhdsii78p" path="res://Scripts/Weapons/weapon_wave_controller.gd" id="1_6jt38"]
 [ext_resource type="Texture2D" uid="uid://cl5ppak5kmji4" path="res://Aseprites/Debug/Weapon_Wave.png" id="1_gum5i"]
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wave"]
+size = Vector2(10, 31)
+
 [sub_resource type="Animation" id="Animation_gum5i"]
 tracks/0/type = "value"
 tracks/0/imported = false
@@ -38,14 +41,17 @@ _data = {
 &"weapon_wave_shrink": SubResource("Animation_6jt38")
 }
 
-[node name="WeaponWave" type="StaticBody2D" unique_id=540317355]
+[node name="WeaponWave" type="Area2D" unique_id=1546009404]
+collision_mask = 3
 script = ExtResource("1_6jt38")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=596941728]
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1041091365]
 texture = ExtResource("1_gum5i")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=85301000]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=203806102]
+position = Vector2(-1, 0.5)
+shape = SubResource("RectangleShape2D_wave")
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1071360432]
+[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=2108547980]
 libraries/ = SubResource("AnimationLibrary_ut7as")
 autoplay = &"RESET"

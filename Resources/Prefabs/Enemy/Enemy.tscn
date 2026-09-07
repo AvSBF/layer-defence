@@ -3,11 +3,13 @@
 [ext_resource type="Script" uid="uid://fup5jqppbo03" path="res://Scripts/Enemies/enemy.gd" id="1"]
 [ext_resource type="Script" uid="uid://chlxfeb7nnuhd" path="res://Scripts/Enemies/health_component.gd" id="2"]
 [ext_resource type="Script" uid="uid://db3aak4hftpbd" path="res://Scripts/Enemies/Resources/enemy_stats.gd" id="2_6ljpu"]
+[ext_resource type="Script" uid="uid://bsufkhlv2d1b6" path="res://Scripts/Enemies/Resources/enemy_ability.gd" id="2_itmco"]
 [ext_resource type="Script" uid="uid://co4ovpx3dxbtm" path="res://Scripts/Enemies/ability_component.gd" id="3"]
 [ext_resource type="Script" uid="uid://bg8ff83tcsvxo" path="res://Scripts/Enemies/state_machine.gd" id="4"]
 [ext_resource type="Script" uid="uid://d13sq5bcvuwld" path="res://Scripts/Enemies/States/idle_state.gd" id="5"]
 [ext_resource type="Script" uid="uid://54fhw3jj4yvo" path="res://Scripts/Enemies/States/chase_state.gd" id="6"]
 [ext_resource type="Script" uid="uid://qghgl5p1cekh" path="res://Scripts/Enemies/States/attack_state.gd" id="7"]
+[ext_resource type="Script" uid="uid://c8kkvfthkwt1s" path="res://Scripts/Enemies/hp_bar.gd" id="10_ky0g8"]
 
 [sub_resource type="Resource" id="Resource_o4lhg"]
 script = ExtResource("2_6ljpu")
@@ -16,21 +18,22 @@ metadata/_custom_type_script = "uid://db3aak4hftpbd"
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_mmoe8"]
 size = Vector2(9, 32)
 
-[node name="Enemy" type="CharacterBody2D" unique_id=588531231]
-script = ExtResource("1")
-stats = SubResource("Resource_o4lhg")
+[node name="Enemy" type="CharacterBody2D" unique_id=588531231 groups=["Enemy"]]
 collision_layer = 2
 collision_mask = 3
+script = ExtResource("1")
+stats = SubResource("Resource_o4lhg")
 
 [node name="ColorRect" type="ColorRect" parent="." unique_id=81728546]
-mouse_filter = 2
 offset_left = -4.5
 offset_top = -16.0
 offset_right = 4.5
 offset_bottom = 16.0
+mouse_filter = 2
 color = Color(0.532889, 0.0020645745, 1.4439226e-07, 1)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=287525638]
+position = Vector2(0.5, 0)
 shape = SubResource("RectangleShape2D_mmoe8")
 
 [node name="HealthComponent" type="Node" parent="." unique_id=1770192057]
@@ -50,3 +53,21 @@ script = ExtResource("6")
 
 [node name="AttackState" type="Node" parent="StateMachine" unique_id=1763256191]
 script = ExtResource("7")
+
+[node name="HP Bar" type="ProgressBar" parent="." unique_id=2123663455]
+top_level = true
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -21.0
+offset_top = 19.0
+offset_right = 21.0
+offset_bottom = 23.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+value = 30.05
+show_percentage = false
+script = ExtResource("10_ky0g8")

@@ -12,7 +12,7 @@ const PLATFORM_LAYER : int = 2
 func _physics_process(delta: float) -> void:
 	var direction_x := Input.get_axis("key_left", "key_right")
 	controller.velocity.x = direction_x * controller.move_speed
-
+	controller.velocity
 	if not controller.is_on_floor():
 		controller.velocity.y += controller.gravity * delta
 	elif Input.is_action_pressed("jump"):
