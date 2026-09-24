@@ -104,12 +104,13 @@
             <a href="#t-ai">14. Техника: ИИ врагов через архетипы</a>
             <a href="#t-weapon">15. Техника: оружие (круг + угол, проджектайлы)</a>
             <a href="#t-shop">16. Техника: магазин и математика апгрейдов</a>
-            <a href="#t-gate">17. Техника: зелёная зона между волнами</a>
-            <a href="#t-pots">18. Техника: горшки с неба</a>
-            <a href="#t-bot">19. Техника: демо-бот и headless-тесты</a>
-            <a href="#balance">20. Баланс в цифрах</a>
-            <a href="#tools">21. Как перегенерировать арт и звук</a>
-            <a href="#next">22. Что дальше</a>
+            <a href="#t-arena">17. Техника: процедурные арены (платформы + портал)</a>
+            <a href="#t-gate">18. Техника: зелёная зона и лут-окно</a>
+            <a href="#t-pots">19. Техника: горшки и сундуки с неба</a>
+            <a href="#t-bot">20. Техника: демо-бот и headless-тесты</a>
+            <a href="#balance">21. Баланс в цифрах</a>
+            <a href="#tools">22. Как перегенерировать арт и звук</a>
+            <a href="#next">23. Что дальше</a>
         </div>
     </div>
 
@@ -173,15 +174,16 @@
                 <path d="M325,140 L325,88" stroke="#ffd34d" stroke-width="2" fill="none" marker-end="url(#ar)"/>
 
                 <text x="565" y="232" text-anchor="middle" fill="#ff5a6a" font-size="12" font-family="Segoe UI">каждая 5-я волна: босс + миньоны (boss bar сверху)</text>
-                <text x="565" y="256" text-anchor="middle" fill="#8d86a8" font-size="12" font-family="Segoe UI">смерть → YOU DIED + статистика забега → RETRY</text>
-                <text x="565" y="280" text-anchor="middle" fill="#55506b" font-size="11" font-family="Segoe UI">во время волны периодически падают горшки (6–10s)</text>
+                <text x="565" y="256" text-anchor="middle" fill="#8d86a8" font-size="12" font-family="Segoe UI">лут-окно 7с → арена перестраивается → магазин → зона снова активна</text>
+                <text x="565" y="280" text-anchor="middle" fill="#55506b" font-size="11" font-family="Segoe UI">смерть → YOU DIED + статистика забега → RETRY</text>
             </svg>
         </div>
         <h3>Кто чем управляет</h3>
         <ul>
-            <li><code>WaveManager</code> — единственный владелец состояния волны: <code>IDLE → SPAWNING → FIGHTING → CLEARED</code>.</li>
+            <li><code>WaveManager</code> — единственный владелец состояния волны: <code>IDLE → SPAWNING → FIGHTING → LOOTING → RESHAPING → CLEARED</code>.</li>
             <li><code>Portal</code> — визуал: дышит, светится, «выплёвывает» врагов по сигналу менеджера.</li>
-            <li><code>WaveGate</code> — зелёная зона: копит заряд, пока игрок внутри, затем просит <code>start_wave()</code>.</li>
+            <li><code>WaveGate</code> — зелёная зона: копит заряд, пока игрок внутри, затем просит <code>start_wave()</code>. Загорается только после того, как арена перестроилась.</li>
+            <li><code>PlatformManager</code> — генерирует раскладку платформ и анимирует переезд между волнами.</li>
             <li><code>Shop</code> — паузит дерево и продаёт апгрейды/оружие за монеты.</li>
             <li><code>World</code> — дирижёр: связывает системы и UI сигналами, сам ничего не считает.</li>
         </ul>
@@ -252,7 +254,8 @@
             <div class="card"><div class="card-title">🪙 Монета</div><div class="card-desc">8-кадровая анимация вращения. Выпадает из врагов (1–10 штук) и горшков. Магнитится в радиусе 42 px (апгрейд LOOT MAGNET добавляет +45).</div></div>
             <div class="card"><div class="card-title">❤️ Сердце</div><div class="card-desc">Восстанавливает 1 HP. Шанс с врага 5%, из горшка — 24%. Притягивается всегда (радиус минимум 30).</div></div>
             <div class="card"><div class="card-title">💎 Гем</div><div class="card-desc">Редкий дроп из горшка (18%): 8–14 монет одним пикапом. Звучит выше на две октавы.</div></div>
-            <div class="card"><div class="card-title">🏺 Горшок</div><div class="card-desc">Падает с неба во время волны каждые 6–10 секунд (75% шанс). Разбивается ударом оружия или снарядом, рассыпая лут. Весит как враг в группе <code>breakable</code>.</div></div>
+            <div class="card"><div class="card-title">🏺 Горшок</div><div class="card-desc">Падает с неба во время волны каждые 6–10 секунд (75% шанс), приземляется на пол или на платформу. Разбивается с одного удара, лут зависит от броска: 3–6 монет / 2 монеты + сердце / гем.</div></div>
+            <div class="card"><div class="card-title">🧰 Сундук</div><div class="card-desc">14% небесных брейкаблов. Два удара, внутри 18 монет + гем + 70% шанс сердца. Даёт тряску камеры и звук «дзинь» — маленький праздник посреди боя.</div></div>
         </div>
         <h3>Пикапы: два состояния движения</h3>
         <p>Пока предмет не коснулся земли — он подчиняется «баллистике» (гравитация 900, рассеивание ±90 по X при вылете). После касания — «парение»: подъём на 8 px и синусоида <code>_bob</code>. Как только игрок в радиусе магнита — предмет переключается в режим полёта к игроку со скоростью, зависящей от расстояния (<code>clamp(340 − dist·0.6, 120, 420)</code>). Такая трёхступенчатая модель даёт читаемый «вылет → приземление → притяжение» без физических тел.</p>
@@ -280,6 +283,7 @@
 ├─ <span class="folder">World/</span>
 │  ├─ <span class="gd">world.gd</span>             <span class="cmt"># связка систем и UI сигналами</span>
 │  ├─ <span class="gd">wave_manager.gd</span>      <span class="cmt"># состояния волны, спавн, горшки, выплаты</span>
+│  ├─ <span class="gd">platform_manager.gd</span>  <span class="cmt"># процедурные раскладки + анимации переезда</span>
 │  ├─ <span class="gd">portal.gd</span> · <span class="gd">wave_gate.gd</span> · <span class="gd">pot.gd</span> · <span class="gd">pickup.gd</span>
 │  ├─ <span class="gd">projectile.gd</span> · <span class="gd">area_damage.gd</span> · <span class="gd">spawn_helper.gd</span>
 │  └─ <span class="gd">arena_camera.gd</span>      <span class="cmt"># follow + trauma-shake + zoom punch</span>
@@ -369,23 +373,36 @@
     </div>
 
     <!-- ======================================================= 9 -->
-    <h2 id="t-sfx">9. Техника: процедурный 8-бит звук</h2>
+    <h2 id="t-sfx">9. Техника: «уютный» процедурный звук</h2>
     <div class="section">
-        <p>23 звука синтезируются в WAV обычной математикой: осцилляторы + огибающая + шум. Никаких сэмплов и лицензий.</p>
-        <div class="code"><span class="kw">def</span> <span class="fn">envelope</span>(t, attack=<span class="nm">0.01</span>, decay=<span class="nm">0.1</span>, sustain=<span class="nm">0.6</span>, release=<span class="nm">0.2</span>, dur=<span class="nm">0.2</span>):
-    <span class="kw">if</span> t &lt; attack:  <span class="kw">return</span> t / attack
-    <span class="kw">if</span> t &lt; attack + decay: <span class="kw">return</span> <span class="nm">1</span> - (<span class="nm">1</span> - sustain) * ((t - attack) / decay)
-    <span class="kw">if</span> t &lt; dur - release: <span class="kw">return</span> sustain
-    <span class="kw">return</span> sustain * (dur - t) / release
+        <p>Все 23 звука синтезируются в WAV математикой (осцилляторы + огибающие + лёгкий шум), без сэмплов и лицензий. Вторая итерация звука делалась по субъективной жалобе «слишком тревожно» — вот какие правила убрали тревогу:</p>
+        <div class="grid">
+            <div class="card"><div class="card-title">Только синус и треугольник</div><div class="card-desc">Квадрат и пила (главные источники «ретро-воя») полностью убраны. Именно они давали ощущение сирены на уроне и смерти.</div></div>
+            <div class="card"><div class="card-title">Low-pass на каждый звук</div><div class="card-desc">Однополюсный фильтр 1.4–6 кГц убирает жёсткие верхние гармоники. Это самый быстрый способ «согреть» синтез.</div></div>
+            <div class="card"><div class="card-title">Мажорные интервалы</div><div class="card-desc">Кнопки — C-E-G-C, лечение — до-мажорное арпеджио, смерть — мягкая колыбельная C-A-F-C вместо минорного стинга.</div></div>
+            <div class="card"><div class="card-title">Мягкая атака и пик 0.6</div><div class="card-desc">Атака 5–15 мс (щелчки исчезают), нормализация в 0.6, tanh-лимитер и мастер −8 дБ: даже 30 одновременных попаданий не режут слух.</div></div>
+            <div class="card"><div class="card-title">Шум — только транзиент</div><div class="card-desc">Шум больше не «тело» звука, а короткий воздушный призвук: свист взмаха, пыль взрыва, «шух» карт.</div></div>
+            <div class="card"><div class="card-title">Короткие и тихие</div><div class="card-desc">Хит — 0.1 с деревянный «ток», монета — две ноты маримбы, крит — колокольчик. Чем короче звук, тем меньше усталости в 40-минутном забеге.</div></div>
+        </div>
+        <div class="code"><span class="kw">def</span> <span class="fn">marimba</span>(t, freq, decay=<span class="nm">9.0</span>):
+    <span class="cm">"""Синус + тихая октава с экспоненциальным телом — тёпло и «деревянно»."""</span>
+    env = math.exp(-t * decay)
+    <span class="kw">return</span> (sine(t, freq) + <span class="nm">0.28</span> * sine(t, freq * <span class="nm">2.0</span>) * math.exp(-t * decay * <span class="nm">1.8</span>)) * env
 
-<span class="kw">def</span> <span class="fn">sfx_hit</span>(dur=<span class="nm">0.12</span>):
-    <span class="cm"># короткий панч: шум + падающий квадрат</span>
-    <span class="kw">return</span> render(dur, <span class="kw">lambda</span> t, p: (noise(rnd) * <span class="nm">0.7</span> + square(t, <span class="nm">160</span> - p * <span class="nm">90</span>) * <span class="nm">0.5</span>)
-                  * envelope(t, <span class="nm">0.002</span>, <span class="nm">0.02</span>, <span class="nm">0.4</span>, dur - <span class="nm">0.05</span>, dur) * (<span class="nm">1</span> - p) ** <span class="nm">2</span>)</div>
-        <p>Звуки читаются из пула на 12 плееров с рандомным питчем ±8–15% — один и тот же «хит» не звучит механически. Плюс каждый звук заканчивается экспоненциальным спадом, иначе в миксе образуется «стена шума» при 30 врагах.</p>
+<span class="kw">def</span> <span class="fn">finish</span>(samples, cutoff=<span class="nm">3000.0</span>, peak=<span class="nm">0.6</span>):
+    <span class="kw">return</span> smooth_edges(lowpass(normalize(samples, peak), cutoff))
+
+<span class="cm"># гитарный пример: монета — «чинг» из двух нот маримбы (G5 → D6)</span>
+<span class="kw">def</span> <span class="fn">sfx_coin</span>(dur=<span class="nm">0.24</span>):
+    <span class="kw">def</span> fn(t, p):
+        f = G5 <span class="kw">if</span> p &lt; <span class="nm">0.42</span> <span class="kw">else</span> <span class="nm">1174.66</span>
+        <span class="kw">return</span> marimba(t, f, <span class="nm">9.0</span>) * <span class="nm">0.75</span> + sine(t, f * <span class="nm">2.0</span>) * math.exp(-t * <span class="nm">18.0</span>) * <span class="nm">0.1</span>
+    <span class="kw">return</span> finish(render(dur, fn), cutoff=<span class="nm">5200.0</span>, peak=<span class="nm">0.5</span>)</div>
+        <div class="note"><strong>Вывод:</strong> «тревожность» звука — это почти всегда квадратная волна + минор + отсутствие фильтра. Три правки (форма волны, интервал, low-pass) меняют настроение сильнее, чем любая громкость.</div>
     </div>
 
     <!-- ======================================================= 10 -->
+<!-- ======================================================= 10 -->
     <h2 id="t-shake">10. Техника: camera shake (trauma + Perlin-шум)</h2>
     <div class="section highlight">
         <p>Классический вопрос: «как сделать тряску, чтобы не тошнило и при этом чувствовалось». Ответ — модель <em>trauma</em> из доклада ГеймМеханик / Squirrel Eiserloh:</p>
@@ -422,7 +439,7 @@
         </table>
         <h4>Zoom punch</h4>
         <p>Отдельный сигнал <code>FX.zoom_punch(0.18)</code> кратко «отъезжает» зумом (до −12% за кадр, возврат 1.6/сек). В связке с shake крупные события читаются как ударная волна через объектив.</p>
-        <div class="note"><strong>Антитошнотные предохранители:</strong> базовая камера плавно следует за игроком с look-ahead по скорости (до 48 px), травма ограничена 1.0, наклон максимум 2°, а лимиты Godot не дают камере выйти за арену.</div>
+        <div class="note"><strong>Антитошнотные предохранители:</strong> базовая камера плавно следует за игроком с look-ahead по скорости (до 48 px), травма ограничена 1.0, наклон максимум 2°, а лимиты Godot не дают камере выйти за арену. Плюс отдельный <code>set_look_offset()</code> поднимает взгляд на портал во время спавна (см. главу 17.4).</div>
     </div>
 
     <!-- ======================================================= 11 -->
@@ -563,9 +580,54 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
     </div>
 
     <!-- ======================================================= 17 -->
-    <h2 id="t-gate">17. Техника: зелёная зона между волнами</h2>
+    <h2 id="t-arena">17. Техника: процедурные арены (платформы + портал)</h2>
+    <div class="section">
+        <p>Арена не статичная декорация: между волнами она перестраивается. Платформы меняют количество и позиции, а портал открывается на противоположной стороне от центра — так каждый раунд начинается в новом месте.</p>
+        <h3>17.1 Раскладка платформ</h3>
+        <p><code>PlatformManager</code> держит список «слотов» по X и «этажей» по Y и набирает из них 3–6 плит. Правила простые, но дают играбельный результат:</p>
+        <div class="code"><span class="kw">const</span> SLOTS := [<span class="nm">-490.0</span>, <span class="nm">-320.0</span>, <span class="nm">-160.0</span>, <span class="nm">0.0</span>, <span class="nm">160.0</span>, <span class="nm">320.0</span>, <span class="nm">490.0</span>]
+<span class="kw">const</span> LEVELS := [<span class="nm">45.0</span>, <span class="nm">-25.0</span>, <span class="nm">-95.0</span>]   <span class="cm"># все достижимы прыжком (108 px)</span>
+
+<span class="cm"># правила генерации:</span>
+<span class="cm">#  * не больше одной плиты в один слот на один этаж;</span>
+<span class="cm">#  * нельзя ставить плиты в соседние этажи одного слота (чтобы не было «бутерброда»);</span>
+<span class="cm">#  * центральный слот не используется на нижнем этаже — там зелёная зона;</span>
+<span class="cm">#  * ширина плиты 1 или 2 юнита (96 / 192 px).</span></div>
+        <h3>17.2 Анимация переезда</h3>
+        <p>Переход — это три разных анимации, которые идут одновременно:</p>
+        <table>
+            <tr><th>Ситуация</th><th>Анимация</th><th>Реализация</th></tr>
+            <tr><td>Плита осталась в раскладке</td><td>едет по X/Y + тянется по ширине</td><td><code>Tween</code> параллельно, <code>TRANS_SINE</code> 0.6s, пыль на старте и финише</td></tr>
+            <tr><td>Появилась новая</td><td>падает сверху и «шлёпается»</td><td>старт на <code>y−420</code>, <code>TRANS_CUBIC / EASE_IN</code> 0.65s, пыль + тряска камеры при касании</td></tr>
+            <tr><td>Плита убрана</td><td>улетает вверх и растворяется</td><td><code>position:y −380</code> + <code>modulate:a → 0</code>, затем <code>queue_free()</code></td></tr>
+        </table>
+        <div class="note"><strong>Почему волну нельзя начать во время переезда:</strong> зелёная зона в этот момент выключена (<code>RESHAPING</code>), а игрок видит подсказку «THE ARENA IS SHIFTING…». Иначе можно было бы оказаться в воздухе без платформы под ногами.</div>
+        <h3>17.3 Переезд портала</h3>
+        <p>Менеджер запоминает, с какой стороны был портал, и каждый раз открывает его с противоположной, на случайном расстоянии 170–430 px от центра. Визуально это телепорт: затухание → сдвиг по X → появление со вспышкой.</p>
+        <div class="code"><span class="kw">func</span> <span class="fn">_move_portal</span>() -&gt; <span class="tp">void</span>:
+    <span class="kw">var</span> side := <span class="nm">-1.0</span> <span class="kw">if</span> _portal_x &gt;= <span class="nm">0.0</span> <span class="kw">else</span> <span class="nm">1.0</span>       <span class="cm"># всегда в другую сторону</span>
+    _portal_x = side * rng.randf_range(<span class="nm">170.0</span>, <span class="nm">430.0</span>)
+    _portal.call(<span class="st">"relocate_to"</span>, _portal_x)</div>
+        <h3>17.4 Кадрирование камеры под дроп</h3>
+        <p>Портал висит в 380 px над ареной — при зуме 2 это не влезает в кадр. Поэтому камера умеет наклонять точку взгляда: пока идёт спавн, <code>look_offset_y</code> плавно уходит к −240, и игрок видит, как из портала сыплются враги; с началом боя камера возвращается к −50.</p>
+        <div class="code"><span class="kw">if</span> wave_manager.state == WaveManager.State.SPAWNING:
+    camera.set_look_offset(<span class="nm">-240.0</span>)   <span class="cm"># смотрим в небо на портал</span>
+<span class="kw">else</span>:
+    camera.set_look_offset(<span class="nm">-50.0</span>)    <span class="cm"># обычный боевой кадр</span></div>
+        <p>Это дешёвый приём «постановочной камеры»: без него игроки не понимают, откуда падают враги, а с ним момент спавна превращается в маленькое шоу.</p>
+    </div>
+
+<!-- ======================================================= 18 -->
+    <h2 id="t-gate">18. Техника: зелёная зона и лут-окно</h2>
     <div class="section">
         <p>Зона — <code>Area2D</code> с анимированным спрайтом (6 кадров, пульсирующая колонна света и стрелка). Заряд считается не по сигналам входа/выхода, а по <em>факту пересечения</em> каждый кадр — это устойчивее к телепортам, паузам и появлению игрока прямо в зоне:</p>
+        <h4>Лут-окно (7 секунд после зачистки)</h4>
+        <p>Раньше магазин открывался мгновенно и паузил игру — монеты, которые только что выпали из врагов, оставались лежать. Теперь после зачистки волны начинается фаза <code>LOOTING</code>: HUD показывает «COLLECT THE LOOT 7s», зона ещё не горит, и у игрока есть время обежать арену. Когда окно закрывается, <code>Pickup.vacuum_all()</code> подбирает всё оставшееся автоматически — ни одна монета не теряется.</p>
+        <div class="code"><span class="kw">func</span> <span class="fn">_update_looting</span>(delta):
+    loot_timer -= delta
+    hint_changed.emit(<span class="st">"COLLECT THE LOOT  %ds"</span> % maxi(<span class="nm">0</span>, <span class="kw">int</span>(ceil(loot_timer))), <span class="kw">true</span>)
+    <span class="kw">if</span> loot_timer &lt;= <span class="nm">0.0</span>:
+        _begin_reshape()      <span class="cm"># vacuum → платформы → портал → магазин</span></div>
         <div class="code"><span class="kw">if</span> _player_inside():                       <span class="cm"># get_overlapping_bodies()</span>
     _charge = minf(<span class="nm">1.0</span>, _charge + delta / CHARGE_TIME)   <span class="cm"># CHARGE_TIME = 0.9s</span>
     <span class="kw">if</span> fmod(_t, <span class="nm">0.12</span>) &lt; delta:
@@ -578,9 +640,14 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
     </div>
 
     <!-- ======================================================= 18 -->
-    <h2 id="t-pots">18. Техника: горшки с неба</h2>
+    <h2 id="t-pots">19. Техника: горшки и сундуки с неба</h2>
     <div class="section">
-        <p>Горшок — <code>CharacterBody2D</code> на своём слое физики (64). Он падает по обычной гравитации, крутится в полёте, а при касании земли «защёлкивается»: обнуляет скорость, сбрасывает вращение, пылит и щёлкает звуком. Ломается по удару оружием/снарядом — <code>break_open()</code>:</p>
+        <p>Горшок — <code>CharacterBody2D</code> на своём слое физики (64). Он падает по обычной гравитации, крутится в полёте, а при касании земли «защёлкивается»: обнуляет скорость, сбрасывает вращение, пылит и щёлкает звуком. Маска коллизий <code>1 | 2</code> — значит, горшок может приземлиться и на пол, и на платформу.</p>
+        <div class="warn note"><strong>Грабли:</strong> если оставить коллизию горшка по центру спрайта, он «проваливается» в пол на половину высоты, а на платформе (слой 2) вообще не задержится. Правильно — сделать точку отсчёта ногой:</div>
+        <div class="code">_shape.position = <span class="tp">Vector2</span>(<span class="nm">0</span>, -circle.radius + <span class="nm">1.0</span>)   <span class="cm"># круг стоит НА земле, а не в ней</span>
+_sprite.position = <span class="tp">Vector2</span>(<span class="nm">0</span>, -frame_h * <span class="nm">0.5</span> + <span class="nm">1.0</span>) <span class="cm"># спрайт сидит на коллизии</span></div>
+        <p>Из тех же «небесных» брейкаблов выпадают и <strong>сундуки</strong> (14% от всех падений): им нужно два удара, внутри — 18 монет, гем и часто сердце. Сундук использует тот же скрипт, отличается только <code>kind</code> и таблицей лута.</p>
+        <p>Ломается по удару оружием/снарядом — <code>break_open()</code>:</p>
         <div class="code"><span class="kw">func</span> <span class="fn">break_open</span>() -&gt; <span class="tp">void</span>:
     Audio.play(<span class="st">"pot"</span>, <span class="nm">0.1</span>, -<span class="nm">2.0</span>)
     FX.play(<span class="st">"explosion"</span>, global_position, {<span class="st">"scale"</span>: <span class="nm">0.45</span>, <span class="st">"modulate"</span>: <span class="tp">Color</span>(<span class="nm">1.0</span>, <span class="nm">0.85</span>, <span class="nm">0.6</span>)})
@@ -594,7 +661,7 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
     </div>
 
     <!-- ======================================================= 19 -->
-    <h2 id="t-bot">19. Техника: демо-бот и headless-тесты</h2>
+    <h2 id="t-bot">20. Техника: демо-бот и headless-тесты</h2>
     <div class="section">
         <p>Проверять игру с волнами и 13 видами ИИ вручную — долго. Поэтому в проект встроен бот, который <em>нажимает те же Input-экшены</em>, что и человек: он реально ходит, прыгает, бьёт и заходит в зелёную зону.</p>
         <div class="code"><span class="cm"># прицел — в ближайшего врага</span>
@@ -619,7 +686,7 @@ godot --path . --quit-after 2000 -- --autotest --shots --start-wave=3</div>
     </div>
 
     <!-- ======================================================= 20 -->
-    <h2 id="balance">20. Баланс в цифрах</h2>
+    <h2 id="balance">21. Баланс в цифрах</h2>
     <div class="section">
         <div class="two-col">
             <div>
@@ -654,7 +721,7 @@ godot --path . --quit-after 2000 -- --autotest --shots --start-wave=3</div>
     </div>
 
     <!-- ======================================================= 21 -->
-    <h2 id="tools">21. Как перегенерировать арт и звук</h2>
+    <h2 id="tools">22. Как перегенерировать арт и звук</h2>
     <div class="section">
         <div class="code"><span class="cm"># 1. вся графика + шрифт + 23 звука (нужен Python 3 + Pillow)</span>
 python Tools/artgen/main.py
@@ -679,7 +746,7 @@ godot --headless --path . --quit-after 1200 -- --autotest</div>
     </div>
 
     <!-- ======================================================= 22 -->
-    <h2 id="next">22. Что дальше</h2>
+    <h2 id="next">23. Что дальше</h2>
     <div class="section">
         <div class="grid">
             <div class="card"><div class="card-title">Мета-прогресс</div><div class="card-desc">Гемы за забег → постоянные бонусы между забегами. <code>GameState</code> уже умеет хранить статистику, нужен только слой сохранения (<code>user://save.cfg</code>).</div></div>
