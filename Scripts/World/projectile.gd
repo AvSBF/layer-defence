@@ -57,10 +57,10 @@ func _ready() -> void:
 	rotation = direction.angle()
 	if friendly:
 		collision_layer = 16
-		collision_mask = 4 | 64
+		collision_mask = 4 | 64 | 1
 	else:
 		collision_layer = 32
-		collision_mask = 2
+		collision_mask = 2 | 1
 	monitoring = true
 	z_index = 12
 
@@ -108,6 +108,10 @@ func _check_hits() -> void:
 	for body in bodies:
 		if _hits.has(body):
 			continue
+		if body is StaticBody2D:
+			# terrain: projectiles stop on walls, platforms and the floor
+			_despawn(true)
+			return
 		if friendly:
 			if body.is_in_group("enemy"):
 				_hits.append(body)

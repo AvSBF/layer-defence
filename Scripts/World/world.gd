@@ -62,6 +62,12 @@ func _start_autotest() -> void:
 	bot.call("setup", self)
 	if OS.get_cmdline_user_args().has("--shots"):
 		_screenshot_loop()
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--weapon="):
+			var wanted : String = arg.split("=")[1]
+			if player != null:
+				player.weapon_id = wanted
+				player.call("equip", wanted)
 	if title != null and title.visible:
 		_dbg("pressing start")
 		title.call("_start")

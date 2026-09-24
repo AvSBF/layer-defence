@@ -419,7 +419,7 @@ def banner():
     img = Img(160, 40)
     for y in range(40):
         t = y / 39.0
-        c = mix(alpha(PANEL_LIT, 235), alpha(PANEL_DRK, 245), t)
+        c = mix(PANEL_LIT, PANEL_DRK, t)
         for x in range(160):
             img.set(x, y, c)
     img.rect(0, 0, 160, 2, BORDER_LIT)

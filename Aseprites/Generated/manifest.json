@@ -1,57 +1,157 @@
 {
- "World/bush.png": {
-  "frame_h": 14,
-  "frame_w": 20,
-  "frames": 1
- },
- "World/ground_fill.png": {
+ "UI/arrow.png": {
   "frame_h": 16,
   "frame_w": 16,
+  "frames": 2
+ },
+ "UI/banner.png": {
+  "frame_h": 40,
+  "frame_w": 160,
   "frames": 1
  },
- "World/ground_top.png": {
-  "frame_h": 10,
-  "frame_w": 16,
+ "UI/boss_bar_frame.png": {
+  "frame_h": 12,
+  "frame_w": 8,
   "frames": 1
  },
- "World/hills_far.png": {
-  "frame_h": 140,
-  "frame_w": 480,
-  "frames": 1
+ "UI/button.png": {
+  "frame_h": 16,
+  "frame_w": 32,
+  "frames": 3
  },
- "World/hills_mid.png": {
-  "frame_h": 120,
-  "frame_w": 480,
-  "frames": 1
- },
- "World/moon.png": {
-  "frame_h": 48,
-  "frame_w": 48,
-  "frames": 1
- },
- "World/pillar.png": {
-  "frame_h": 72,
+ "UI/card.png": {
+  "frame_h": 24,
   "frame_w": 24,
   "frames": 1
  },
- "World/platform.png": {
-  "frame_h": 16,
-  "frame_w": 96,
-  "frames": 1
- },
- "World/platform_small.png": {
-  "frame_h": 16,
-  "frame_w": 48,
-  "frames": 1
- },
- "World/sky.png": {
-  "frame_h": 512,
-  "frame_w": 1024,
-  "frames": 1
- },
- "World/torch.png": {
+ "UI/crosshair.png": {
   "frame_h": 20,
-  "frame_w": 10,
-  "frames": 4
+  "frame_w": 20,
+  "frames": 1
+ },
+ "UI/cursor.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/heart.png": {
+  "frame_h": 10,
+  "frame_w": 11,
+  "frames": 3
+ },
+ "UI/icons/armor.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/attack_speed.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/boss.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/coin.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/crit.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/damage.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/dash.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/fire.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/health.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/ice.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/lifesteal.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/luck.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/magnet.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/pot.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/potion.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/reroll.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/shield.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/skull.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/speed.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/star.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/weapon.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/panel.png": {
+  "frame_h": 24,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "UI/slot.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 1
  }
 }

@@ -120,7 +120,7 @@ func _build() -> void:
 
 	_boss_root = VBoxContainer.new()
 	_boss_root.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	_boss_root.position = Vector2(-230, 62)
+	_boss_root.position = Vector2(-230, 96)
 	_boss_root.custom_minimum_size = Vector2(460, 0)
 	_boss_root.visible = false
 	_boss_root.mouse_filter = Control.MOUSE_FILTER_IGNORE
