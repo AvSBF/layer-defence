@@ -206,15 +206,24 @@ func _dash_update(delta : float) -> void:
 			"modulate": Color(0.6, 1.4, 1.5, 0.8)})
 
 func _update_aim() -> void:
-	var mouse := get_global_mouse_position()
-	if absf(mouse.x - global_position.x) > 4.0:
-		facing = 1 if mouse.x > global_position.x else -1
+	# the knight always faces where he is aiming (mouse, or the demo bot's
+	# override), and the weapon pose follows in the same frame
+	var aim := aim_direction()
+	var reference : Vector2 = global_position + aim
+	if absf(reference.x - global_position.x) > 0.1:
+		facing = 1 if reference.x > global_position.x else -1
 	_update_weapon_pose()
 
+const HAND_OFFSET := Vector2(4.0, 2.0)   ## where the hand is, relative to the body centre
+const WEAPON_FRAME := Vector2(40.0, 40.0)
+const WEAPON_PIVOT := Vector2(20.0, 34.0)
+
 func _update_weapon_pose() -> void:
+	# one mirror only: the whole Weapon node flips, so the artwork, the swing
+	# arc and the pivot all turn together (a second flip_h would cancel out)
 	weapon_root.scale.x = float(facing)
-	weapon_sprite.flip_h = facing < 0
-	weapon_sprite.position = Vector2(-20.0, -34.0)
+	weapon_sprite.flip_h = false
+	weapon_sprite.position = HAND_OFFSET - WEAPON_PIVOT
 
 func aim_direction() -> Vector2:
 	if GameState.autotest and aim_override.length() > 0.01:
@@ -269,8 +278,10 @@ func _melee_hit(aim : Vector2) -> void:
 	var hit_something : bool = false
 	var slash : String = str(weapon.get("slash", "slash_steel"))
 	if slash != "":
+		# the arc sheet already spans both sides of the aim direction, so the
+		# rotation alone points it at the target (no extra flip)
 		FX.play(slash, global_position + Vector2(0, -2), {"rotation": aim.angle(), "scale": reach / 40.0,
-			"flip": aim.x < 0.0, "z": 15})
+			"z": 15})
 	FX.shake(float(weapon.get("shake", 0.08)))
 
 	# circle query, then filter by the weapon's swing arc
@@ -315,7 +326,9 @@ func _shoot(aim : Vector2) -> void:
 	var count : int = 1 + int(GameState.get_stat("projectile_bonus"))
 	var pierce : int = int(weapon.get("pierce_count", 0)) + int(GameState.get_stat("pierce_bonus"))
 	var spread : float = 0.09
-	var origin : Vector2 = weapon_root.global_position + Vector2(facing * 8.0, -6.0)
+	# muzzle sits at the hand (mirrored with facing) and a bit along the aim,
+	# so arrows visibly leave the bow instead of the character's chest
+	var origin : Vector2 = global_position + Vector2(HAND_OFFSET.x * facing, HAND_OFFSET.y) + aim * 12.0
 	for i in count:
 		var offset := 0.0
 		if count > 1:

@@ -74,13 +74,27 @@ func _start_autotest() -> void:
 	GameState.autotest_mortal = OS.get_cmdline_user_args().has("--mortal")
 	print("[autotest] starting demo bot")
 	_start_bot()
-	if OS.get_cmdline_user_args().has("--shots"):
-		_screenshot_loop()
+	var shot_interval := 0.0
+	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--shots"):
+			shot_interval = 2.0
+			if arg.contains("="):
+				shot_interval = maxf(0.1, float(arg.split("=")[1]))
+	if shot_interval > 0.0:
+		_screenshot_loop(shot_interval)
+	if OS.get_cmdline_user_args().has("--batcheck"):
+		for i in 3:
+			SpawnHelper.spawn_enemy(self, "bat", Vector2(-220.0 + i * 220.0, -150.0), 3, false)
 	if OS.get_cmdline_user_args().has("--pots"):
 		for i in 5:
 			var x := -560.0 + i * 280.0
 			Pot.spawn(self, Vector2(x, -200.0), 140.0, "chest" if i == 2 else "pot")
 	for arg in OS.get_cmdline_user_args():
+		if arg.begins_with("--aim="):
+			match arg.split("=")[1]:
+				"left": GameState.aim_lock = Vector2(-1, 0)
+				"right": GameState.aim_lock = Vector2(1, 0)
+				"up": GameState.aim_lock = Vector2(0, -1)
 		if arg.begins_with("--weapon="):
 			var wanted : String = arg.split("=")[1]
 			if player != null:
@@ -94,10 +108,10 @@ func _start_autotest() -> void:
 
 ## Autotest helper: grabs a series of frames so the visuals can be verified
 ## without a human at the keyboard.
-func _screenshot_loop() -> void:
+func _screenshot_loop(interval : float = 2.0) -> void:
 	var shot := 0
 	while shot < 24:
-		await get_tree().create_timer(2.0, true, false, true).timeout
+		await get_tree().create_timer(interval, true, false, true).timeout
 		await RenderingServer.frame_post_draw
 		var img := get_viewport().get_texture().get_image()
 		if img != null:
@@ -110,6 +124,8 @@ func _on_start_requested() -> void:
 	_run_active = true
 	Audio.play("wave_start", 0.0, -6.0)
 	GameState.start_run()
+	if GameState.autotest and OS.get_cmdline_user_args().has("--rich"):
+		GameState.add_coins(600)   # test budget: exercised by the shop smoke test
 	if wave_manager != null:
 		wave_manager.start_run()
 
@@ -120,12 +136,19 @@ func _on_hint_changed(text : String, visible : bool) -> void:
 func _on_wave_cleared(_wave : int) -> void:
 	pass
 
-## Frame the sky portal while enemies are dropping, then settle back down.
+## Frame the sky portal while enemies are dropping: the camera leans slightly
+## towards the portal (not just straight up), then settles back on the player.
 func _process(_delta : float) -> void:
 	if camera == null or wave_manager == null:
 		return
-	var spawning : bool = wave_manager.state == WaveManager.State.SPAWNING
-	camera.call("set_look_offset", -240.0 if spawning else -50.0)
+	if wave_manager.state == WaveManager.State.SPAWNING:
+		camera.call("set_look_offset", -90.0)
+		var portal := get_node_or_null("Portal")
+		if portal != null:
+			camera.call("set_focus_point", portal.global_position)
+	else:
+		camera.call("set_look_offset", -50.0)
+		camera.call("clear_focus")
 
 func _on_wave_started(wave : int, is_boss : bool, info : Dictionary) -> void:
 	if banner != null:

@@ -148,33 +148,31 @@ def scythe_frames():
 
 
 def bow_frames():
+    """Grip sits ON the pivot (20,34) so the bow lands in the knight's hand."""
     frames = []
     for k in range(6):
         img = Img(FW, FH)
-        cx, cy = 14, 20
+        cx, cy = 19, 30
         draw = [0.0, 0.4, 0.8, 1.0, 0.3, 0.0][k]
-        # bow limbs
-        for i in range(-9, 10):
+        # bow limbs (upper + lower), bulging forward
+        for i in range(-8, 9):
             y = cy + i
-            x = cx + int(4 * (1 - (abs(i) / 9.0) ** 2))
+            x = cx + int(3 * (1 - (abs(i) / 8.0) ** 2))
             _px(img, x, y, P["wood"])
             _px(img, x + 1, y, P["wood_drk"])
-            if abs(i) > 7:
+            if abs(i) > 6:
                 _px(img, x - 1, y, P["wood_drk"])
-        # string
-        sx = cx + 2 - int(draw * 6)
-        for i in range(-9, 10):
+        # string, pulled back as the shot charges
+        sx = cx + 2 - int(draw * 5)
+        for i in range(-8, 9):
             y = cy + i
-            t = 1 - abs(i) / 9.0
+            t = 1 - abs(i) / 8.0
             _px(img, sx + (1 - t) * 2, y, P["web"])
-        # arrow
-        if draw > 0.05:
-            ax = sx + 1
-        else:
-            ax = cx + 3
-        for i in range(int(draw * 6) + 6):
+        # nocked arrow pointing along +x
+        ax = sx + 1 if draw > 0.05 else cx + 3
+        for i in range(int(draw * 5) + 6):
             _px(img, ax + i, cy, P["wood"])
-        _px(img, ax + int(draw * 6) + 7, cy, P["steel_lit"])
+        _px(img, ax + int(draw * 5) + 7, cy, P["steel_lit"])
         if draw >= 0.99:
             _px(img, ax, cy - 1, P["white"])
             _px(img, ax, cy + 1, P["white"])
@@ -184,26 +182,26 @@ def bow_frames():
 
 
 def staff_frames():
+    """Held leaning forward: the crystal ends up beside the head, not above it."""
     frames = []
     for k in range(6):
         img = Img(FW, FH)
         cx, cy = PIVOT
         charge = [0.0, 0.35, 0.7, 1.0, 0.6, 0.2][k]
-        a = -1.5 + k * 0.12
-        _line_rot(img, cx, cy, a, 26, P["wood"], 2)
-        _line_rot(img, cx, cy, a + 0.05, 26, P["wood_drk"], 1)
-        tx = cx + math.cos(a) * 27
-        ty = cy + math.sin(a) * 27
+        a = -1.15 + k * 0.09
+        _line_rot(img, cx, cy, a, 17, P["wood"], 2)
+        _line_rot(img, cx, cy, a + 0.06, 17, P["wood_drk"], 1)
+        tx = cx + math.cos(a) * 18
+        ty = cy + math.sin(a) * 18
         if charge > 0:
-            r = 2 + charge * 3
+            r = 2 + charge * 2.6
             img.ellipse(tx, ty, r + 1, r + 1, alpha(P["cyan"], int(90 * charge) + 40))
             img.ellipse(tx, ty, r, r, alpha(P["robe_lit"], 180))
             img.ellipse(tx, ty, max(1.0, r - 2), max(1.0, r - 2), P["white"])
         else:
             img.ellipse(tx, ty, 2, 2, P["teal"])
-        # crystal shards orbiting
-        for s in range(3):
-            ang = a + s * 2.0 + charge * 3.0
+        for s_i in range(3):
+            ang = a + s_i * 2.0 + charge * 3.0
             _px(img, tx + math.cos(ang) * (4 + charge * 3), ty + math.sin(ang) * (4 + charge * 3), P["cyan"])
         frames.append(img)
     return frames

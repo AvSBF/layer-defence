@@ -40,6 +40,11 @@ var _wobble : float = 0.0
 var _stuck_timer : float = 0.0
 var _spawn_grace : float = 0.4
 var _drop_timer : float = 0.0
+var _windup_timer : float = 0.0
+var _dive_timer : float = 0.0
+var _dive_cooldown : float = 0.0
+var _dive_dir : Vector2 = Vector2.ZERO
+var _telegraph : float = 0.0
 var _phase : int = 1
 var action_lock : float = 0.0
 var _slam_pending : bool = false
@@ -192,6 +197,8 @@ func _update_modulate() -> void:
 		col = col.lerp(Color(1.35, 1.3, 0.6), 0.5)
 	if _phase == 2 and boss:
 		col = col.lerp(Color(1.0, 0.4, 0.4), 0.3)
+	if _telegraph > 0.0:
+		col = col.lerp(Color(1.9, 1.1, 0.7), _telegraph * 0.8)
 	if _hit_flash > 0.0:
 		col = Color(3, 3, 3, col.a)
 	sprite.modulate = col
@@ -229,7 +236,7 @@ func _ai(delta : float) -> void:
 			if _attack_cd <= 0.0 and dist < float(data.get("attack_range", 20.0)) + 8.0:
 				_melee_swing()
 		"flyer":
-			_fly_towards(to_target, delta)
+			_flyer(to_target, dist, delta)
 			if _attack_cd <= 0.0 and dist < float(data.get("attack_range", 18.0)) + 6.0:
 				_melee_swing()
 		"thrower", "archer", "caster":
@@ -277,6 +284,45 @@ func _fly_towards(to_target : Vector2, delta : float) -> void:
 	target_vel.y = clampf((desired_y - global_position.y) * 3.2, -sp * 1.4, sp * 1.4)
 	velocity = velocity.lerp(target_vel, clampf(5.0 * delta, 0.0, 1.0))
 	_play_anim("run")
+
+## Bats (and other flyers) hover next to the player, telegraph a wind-up, then
+## swoop through. The pattern is deliberately readable: hold -> flash -> dive.
+func _flyer(to_target : Vector2, dist : float, delta : float) -> void:
+	var sp := speed * slow_factor
+	if _windup_timer > 0.0:
+		_windup_timer -= delta
+		velocity = velocity.lerp(Vector2.ZERO, clampf(8.0 * delta, 0.0, 1.0))
+		_telegraph = 1.0
+		_play_anim("attack")
+		if _windup_timer <= 0.0:
+			_telegraph = 0.0
+			_dive_dir = (target.global_position + Vector2(0, -6) - global_position).normalized()
+			_dive_timer = float(data.get("dive_time", 0.36))
+			Audio.play("swing", 0.2, -10.0)
+			FX.play("dust", global_position, {"scale": 0.7, "modulate": Color("#b79bf0")})
+		return
+	if _dive_timer > 0.0:
+		_dive_timer -= delta
+		velocity = _dive_dir * float(data.get("dive_speed", 470.0))
+		_play_anim("attack")
+		if _dive_timer <= 0.0:
+			_dive_cooldown = float(data.get("dive_cd", 2.1))
+			_play_anim("run")
+		return
+	if _dive_cooldown > 0.0:
+		_dive_cooldown -= delta
+	# hover at a readable stand-off point above and to the side of the player
+	var hover := float(data.get("hover", 46.0))
+	var side := -1.0 if to_target.x >= 0.0 else 1.0
+	var anchor := target.global_position + Vector2(side * 42.0, -hover - 26.0)
+	var to_anchor := anchor - global_position
+	var target_vel := to_anchor.normalized() * sp
+	target_vel.y += sin(_wobble * 3.4) * 22.0
+	velocity = velocity.lerp(target_vel, clampf(4.5 * delta, 0.0, 1.0))
+	_play_anim("run")
+	if _dive_cooldown <= 0.0 and dist < 260.0 and to_target.y > -230.0:
+		_windup_timer = float(data.get("windup", 0.34))
+		_dive_cooldown = 0.0001
 
 func _kiter(to_target : Vector2, dist : float, delta : float, keep : float) -> void:
 	var sp := speed * slow_factor

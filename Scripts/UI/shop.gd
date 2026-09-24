@@ -169,7 +169,9 @@ func _build_card(offer : Dictionary, index : int) -> Control:
 	box.add_theme_constant_override("separation", 6)
 	panel.add_child(box)
 
-	var is_weapon : bool = offer["type"] == "weapon"
+	# "sold" cards keep showing what they were, not whatever id happens to
+	# resolve next
+	var is_weapon : bool = str(offer.get("was", offer["type"])) == "weapon"
 	var data : Dictionary
 	if is_weapon:
 		data = WeaponCatalog.get_weapon(offer["id"])
@@ -244,14 +246,22 @@ func _buy(index : int) -> void:
 	if index < 0 or index >= _offers.size():
 		return
 	var offer : Dictionary = _offers[index]
+	if offer["type"] == "sold":
+		return
 	var cost : int = _cost_of(offer)
-	if GameState.coins < cost:
-		GameState.spend(cost)  # triggers the "not enough" feedback
-		return
-	if not GameState.spend(cost):
-		return
+	# cost 0 still has to go through (re-equipping an owned weapon is free) -
+	# GameState.spend(0) reports false, so it is handled explicitly here
+	if cost > 0:
+		if GameState.coins < cost:
+			GameState.spend(cost)  # plays the "NOT ENOUGH COINS" feedback
+			_shake_card(index)
+			return
+		if not GameState.spend(cost):
+			return
 	if offer["type"] == "weapon":
-		if GameState.player != null:
+		if GameState.player != null and is_instance_valid(GameState.player):
+			if str(GameState.player.weapon_id) == str(offer["id"]):
+				return  # already in hand
 			GameState.player.equip(offer["id"])
 		GameState.mark_weapon_owned(offer["id"])
 		Audio.play("buy", 0.05, 2.0)
@@ -260,11 +270,37 @@ func _buy(index : int) -> void:
 		GameState.apply_upgrade(up)
 		Audio.play("buy")
 	FX.flash(Color("#ffd34d"), 0.12)
-	# card becomes SOLD
-	_offers[index] = {"type": "sold", "id": offer["id"]}
+	# card becomes SOLD (remembering what it was, for the card face)
+	_offers[index] = {"type": "sold", "id": offer["id"], "was": offer["type"]}
 	_repopulate_card(index)
 	_refresh_coins()
 	Audio.play("coin", 0.05, -2.0)
+	_flash_card(index)
+
+## Little "no" wiggle for a card the player cannot afford yet.
+func _shake_card(index : int) -> void:
+	if index >= _card_nodes.size():
+		return
+	var card : Node = _card_nodes[index]
+	if not is_instance_valid(card) or not (card is Control):
+		return
+	var c := card as Control
+	var base := c.position
+	var t := create_tween()
+	for i in 3:
+		t.tween_property(c, "position:x", base.x + (6.0 if i % 2 == 0 else -6.0), 0.05)
+	t.tween_property(c, "position:x", base.x, 0.05)
+
+## Little pop on the card that was just bought.
+func _flash_card(index : int) -> void:
+	if index >= _card_nodes.size():
+		return
+	var card : Node = _card_nodes[index]
+	if not is_instance_valid(card):
+		return
+	var t := create_tween()
+	card.scale = Vector2(1.08, 1.08)
+	t.tween_property(card, "scale", Vector2.ONE, 0.22).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 
 func _cost_of(offer : Dictionary) -> int:
 	if offer["type"] == "weapon":
@@ -284,15 +320,17 @@ func _repopulate_card(index : int) -> void:
 	_cards_box.move_child(card, index)
 	_card_nodes[index] = card
 
-## Used by the demo bot / attract mode: buy the cheapest thing we can afford.
+## Used by the demo bot / attract mode: weapons first (that also keeps the
+## EQUIP path exercised on every smoke test), then whatever is affordable.
 func autobuy() -> void:
-	for i in _offers.size():
-		var offer : Dictionary = _offers[i]
-		if offer["type"] == "sold":
-			continue
-		if GameState.coins >= _cost_of(offer):
-			_buy(i)
-			return
+	for wanted in ["weapon", "upgrade"]:
+		for i in _offers.size():
+			var offer : Dictionary = _offers[i]
+			if offer["type"] != wanted:
+				continue
+			if GameState.coins >= _cost_of(offer):
+				_buy(i)
+				return
 
 func _on_reroll() -> void:
 	var cost := 4 + GameState.shop_rerolls * 3
@@ -327,9 +365,19 @@ func _refresh_coins() -> void:
 			btn.disabled = true
 			continue
 		var cost := _cost_of(offer)
-		btn.disabled = GameState.coins < cost
+		# never hard-disable: a click on an unaffordable card must explain
+		# itself ("NOT ENOUGH COINS") instead of doing nothing
+		var affordable : bool = GameState.coins >= cost
+		btn.modulate = Color.WHITE if affordable else Color(0.55, 0.55, 0.65)
 		if offer["type"] == "weapon":
-			btn.text = "EQUIP  %d" % cost
+			var equipped_now : bool = (GameState.player != null
+				and is_instance_valid(GameState.player)
+				and str(GameState.player.weapon_id) == str(offer["id"]))
+			if equipped_now:
+				btn.text = "EQUIPPED"
+				btn.modulate = Color(0.75, 1.0, 0.85)
+			else:
+				btn.text = "EQUIP  %d" % cost
 		else:
 			btn.text = "BUY  %d" % cost
 

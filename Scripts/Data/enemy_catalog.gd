@@ -30,6 +30,7 @@ const TYPES := {
 		"sheet": "Enemies/bat_%s.png", "frame": Vector2i(16, 12), "scale": 1.0,
 		"body": Vector2(14, 10), "sprite_lift": 0.0, "flying": true,
 		"attack_range": 16.0, "attack_cd": 0.9, "knockback_res": 0.1, "hover": 46.0,
+		"windup": 0.34, "dive_speed": 470.0, "dive_time": 0.36, "dive_cd": 2.1,
 		"fps": 10.0,
 	},
 	"skeleton": {

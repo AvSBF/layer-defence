@@ -103,6 +103,7 @@
             <a href="#t-waves">13. Техника: генерация волн по бюджету</a>
             <a href="#t-ai">14. Техника: ИИ врагов через архетипы</a>
             <a href="#t-weapon">15. Техника: оружие (круг + угол, проджектайлы)</a>
+            <a href="#t-read">16. Техника: читаемость (радиус, полёт, ориентация)</a>
             <a href="#t-shop">16. Техника: магазин и математика апгрейдов</a>
             <a href="#t-arena">17. Техника: процедурные арены (платформы + портал)</a>
             <a href="#t-gate">18. Техника: зелёная зона и лут-окно</a>
@@ -528,6 +529,7 @@
         <ul>
             <li><b>Телеграф перед слэмом:</b> сначала FX <code>telegraph</code> (красное кольцо, 0.6s), потом <code>AreaDamage.explode()</code> — игрок успевает уйти.</li>
             <li><b>Шоквейв по приземлению:</b> флаг <code>_slam_pending</code> ставится при прыжке, «взводится» только когда моб реально в воздухе и срабатывает при касании земли.</li>
+            <li><b>Летуны:</b> цикл «караулить → вспышка → пикировать» и тень на земле — подробно в главе 16.4.</li>
             <li><b>Замедление и стан:</b> <code>apply_slow()</code> и <code>apply_stun()</code> пишут множители в <code>slow_factor</code>/<code>stun_timer</code>, а <code>_update_modulate()</code> красит спрайт в синий/жёлтый — статус всегда виден.</li>
         </ul>
     </div>
@@ -576,10 +578,64 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
             <li>кнопки неактивны, когда монет не хватает (серый цвет = понятная обратная связь);</li>
             <li>покупка: жёлтая вспышка экрана, звук <code>buy</code>, карта становится <code>SOLD</code>.</li>
         </ul>
+        <h4>Мелочь, которая ломала EQUIP</h4>
+        <p>Повторное «EQUIP 0» (оружие уже куплено — можно взять бесплатно) не срабатывало: <code>GameState.spend(0)</code> возвращает <code>false</code>, а магазин трактовал это как «не хватило монет». Плюс кнопка при нехватке денег уходила в <code>disabled</code> и молчала вместо объяснения. Теперь нулевая цена обрабатывается явно, кнопки никогда не блокируются, а клик по недоступной карте трясёт её и показывает «NOT ENOUGH COINS».</p>
         <div class="note"><strong>Экономика:</strong> обычный враг даёт 1–6 монет (со множителем GREED до +100%), бонус за волну <code>6 + wave×2</code>, горшок 3–6 монет или 8–14 гемом. Первый магазин на 1-й волне обычно открывает 1–2 покупки — темп задан так, чтобы к 5-й волне у игрока было 2–4 апгрейда или новое оружие.</div>
     </div>
 
-    <!-- ======================================================= 17 -->
+    <!-- ======================================================= 16 -->
+    <h2 id="t-read">16. Техника: читаемость (радиус оружия, полёт, ориентация)</h2>
+    <div class="section highlight">
+        <p>Три правки после плейтеста — все про то, что игрок должен понимать без объяснений: куда он бьёт, где летает враг и с какой стороны находится оружие.</p>
+        <h3>16.1 Индикатор радиуса оружия</h3>
+        <p>Под ногами рисуется полупрозрачный сектор, точно совпадающий с хитбоксом: радиус = <code>range × (1 + бонус дальности)</code>, угол = <code>arc</code> оружия. Для дальнего боя — пунктирный луч и кружок на пределе дистанции. Рисуется вручную через <code>_draw()</code> и пересчитывается каждый кадр, поэтому апгрейды видно мгновенно.</p>
+        <div class="code"><span class="kw">func</span> <span class="fn">_draw_melee</span>(aim: <span class="tp">Vector2</span>, range_stat: <span class="tp">float</span>) -&gt; <span class="tp">void</span>:
+    <span class="kw">var</span> reach := <span class="kw">float</span>(player.weapon[<span class="st">"range"</span>]) * range_stat
+    <span class="kw">var</span> arc := deg_to_rad(<span class="kw">float</span>(player.weapon[<span class="st">"arc"</span>]))
+    <span class="kw">var</span> base := aim.angle()
+    <span class="cm"># залитый сектор = реальная зона попадания</span>
+    draw_colored_polygon(points, <span class="tp">Color</span>(<span class="nm">0.55</span>, <span class="nm">0.95</span>, <span class="nm">1.0</span>, <span class="nm">0.10</span>))
+    draw_arc(<span class="tp">Vector2</span>.ZERO, reach, base - arc * <span class="nm">0.5</span>, base + arc * <span class="nm">0.5</span>, <span class="nm">26</span>,
+        <span class="tp">Color</span>(<span class="nm">0.55</span>, <span class="nm">0.95</span>, <span class="nm">1.0</span>, <span class="nm">0.42</span>), <span class="nm">1.8</span>, <span class="kw">true</span>)</div>
+        <div class="note"><strong>Почему это важно:</strong> до индикатора игрок не понимал, достаёт ли он до врага — 40 пикселей радиуса при зуме 2 субъективно читаются совсем иначе, чем в цифрах. Теперь «достаю / не достаю» решается за один взгляд.</div>
+        <h3>16.2 Ориентация оружия: один флип, а не два</h3>
+        <p>Меч «не разворачивался», потому что зеркалирование применялось дважды: у родителя <code>Weapon.scale.x = facing</code> и у самого спрайта <code>flip_h = facing &lt; 0</code>. Два зеркала взаимно уничтожаются — визуально оружие всегда оставалось справа (а анимация замаха — с прежней стороны).</p>
+        <div class="code"><span class="cm"># правильно: зеркалим один раз — весь узел Weapon, включая пивот</span>
+weapon_root.scale.x = <span class="kw">float</span>(facing)
+weapon_sprite.flip_h = <span class="kw">false</span>
+weapon_sprite.position = HAND_OFFSET - WEAPON_PIVOT</div>
+        <p>Пивот ствола оружия равен точке хвата в кадре (20,34), поэтому <code>position = HAND_OFFSET - PIVOT</code> ставит рукоять ровно в руку рыцаря. Тот же приём убрал двойной флип у VFX замаха: дуга слаша уже симметрична относительно направления, ей хватает одного <code>rotation = aim.angle()</code>.</p>
+        <h3>16.3 Тень летающих врагов</h3>
+        <p>Летучая мышь летала без гравитации — и было непонятно, где она вообще находится по высоте. Теперь под ней на пол/платформу проецируется эллипс: луч вниз находит поверхность, а альфа и размер зависят от высоты (до 420 px).</p>
+        <div class="code"><span class="kw">var</span> hit := space.intersect_ray(params)
+<span class="kw">if</span> hit.is_empty(): visible = <span class="kw">false</span>; <span class="kw">return</span>
+_height = clampf(hit.position.y - from.y, <span class="nm">0.0</span>, MAX_HEIGHT)
+global_position = <span class="tp">Vector2</span>(enemy.global_position.x, hit.position.y - <span class="nm">1.0</span>)
+<span class="kw">var</span> t := <span class="nm">1.0</span> - _height / MAX_HEIGHT
+scale = <span class="tp">Vector2</span>(<span class="nm">0.45</span> + <span class="nm">0.75</span> * t, (<span class="nm">0.45</span> + <span class="nm">0.75</span> * t) * <span class="nm">0.38</span>)
+modulate.a = <span class="nm">0.10</span> + <span class="nm">0.30</span> * t</div>
+        <h3>16.4 Понятный полёт мыши: караулить → вспышка → пикировать</h3>
+        <p>Раньше мышь просто «висела и подъедала» — поведение не читалось. Теперь это цикл из трёх фаз с телеграфом:</p>
+        <div class="flow">
+            <div class="flow-step">1. HOVER — держит дистанцию сверху-сбоку (42 px в сторону, +26 вверх)</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step hot">2. WINDUP 0.34s — замирает и подсвечивается тёплым</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">3. DIVE 0.36s — бросок 470 px/s сквозь игрока</div>
+            <span class="flow-arrow">→</span>
+            <div class="flow-step">4. RECOVER + кулдаун 2.1s</div>
+        </div>
+        <div class="code"><span class="kw">if</span> _windup_timer &gt; <span class="nm">0.0</span>:
+    _windup_timer -= delta
+    velocity = velocity.lerp(<span class="tp">Vector2</span>.ZERO, <span class="nm">8.0</span> * delta)   <span class="cm"># замирает</span>
+    _telegraph = <span class="nm">1.0</span>                              <span class="cm"># и светится: игрок видит «сейчас прыгнет»</span>
+    <span class="kw">if</span> _windup_timer &lt;= <span class="nm">0.0</span>:
+        _dive_dir = (target.global_position - global_position).normalized()
+        _dive_timer = <span class="nm">0.36</span></div>
+        <p>Телеграф реализован одним полем <code>_telegraph</code>, которое подмешивается в общий проход <code>_update_modulate()</code> — тот же, что отвечает за вспышку урона, замедление и стан. Одна точка правды для «как спрайт выглядит сейчас».</p>
+    </div>
+
+<!-- ======================================================= 17 -->
     <h2 id="t-arena">17. Техника: процедурные арены (платформы + портал)</h2>
     <div class="section">
         <p>Арена не статичная декорация: каждую чётную волну и после каждого босса она перестраивается. Платформы меняют количество и позиции, а портал открывается на противоположной стороне от центра — так каждый раунд начинается в новом месте.</p>
@@ -609,11 +665,17 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
     _portal_x = side * rng.randf_range(<span class="nm">170.0</span>, <span class="nm">430.0</span>)
     _portal.call(<span class="st">"relocate_to"</span>, _portal_x)</div>
         <h3>17.4 Кадрирование камеры под дроп</h3>
-        <p>Портал висит в 380 px над ареной — при зуме 2 это не влезает в кадр. Поэтому камера умеет наклонять точку взгляда: пока идёт спавн, <code>look_offset_y</code> плавно уходит к −240, и игрок видит, как из портала сыплются враги; с началом боя камера возвращается к −50.</p>
+        <p>Портал висит высоко над ареной — при зуме 2 он не влезает в кадр целиком. Поэтому камера не «уезжает вверх», а <em>подтягивается в сторону портала</em>: вектор до цели умножается на 0.42 и обрезается по <code>focus_max = (96, 110)</code>. Смещение маленькое (это подсказка, а не катсцена), но игрок сразу видит, откуда сыплются враги. Плюс сам кадр слегка поднимается: <code>look_offset_y</code> уходит с −50 к −90 и возвращается с началом боя.</p>
         <div class="code"><span class="kw">if</span> wave_manager.state == WaveManager.State.SPAWNING:
-    camera.set_look_offset(<span class="nm">-240.0</span>)   <span class="cm"># смотрим в небо на портал</span>
+    camera.set_look_offset(<span class="nm">-90.0</span>)                    <span class="cm"># чуть выше обычного</span>
+    camera.set_focus_point(portal.global_position)   <span class="cm"># и наклониться к порталу</span>
 <span class="kw">else</span>:
-    camera.set_look_offset(<span class="nm">-50.0</span>)    <span class="cm"># обычный боевой кадр</span></div>
+    camera.set_look_offset(<span class="nm">-50.0</span>)
+    camera.clear_focus()</div>
+        <div class="code"><span class="kw">func</span> <span class="fn">_update_focus</span>(delta, player_pos):
+    <span class="kw">var</span> to_point := _focus_point - player_pos
+    _focus_goal = (to_point * focus_ratio).clamp(-focus_max, focus_max)  <span class="cm"># маленький сдвиг</span>
+    _focus_offset = _focus_offset.lerp(_focus_goal, focus_speed * delta)</div>
         <p>Это дешёвый приём «постановочной камеры»: без него игроки не понимают, откуда падают враги, а с ним момент спавна превращается в маленькое шоу.</p>
     </div>
 

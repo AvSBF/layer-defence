@@ -17,6 +17,12 @@ extends Camera2D
 @export var look_ahead : float = 48.0
 @export var look_offset_y : float = -50.0
 @export var look_offset_speed : float = 2.2
+@export var focus_speed : float = 2.6
+## How far the camera may lean away from the player when framing a point of
+## interest (the portal during a drop). Small on purpose - it is a nudge, not
+## a cutscene.
+@export var focus_max : Vector2 = Vector2(96.0, 110.0)
+@export var focus_ratio : float = 0.42
 
 var trauma : float = 0.0
 var target : Node2D
@@ -27,6 +33,10 @@ var _time : float = 0.0
 var _zoom_punch : float = 0.0
 var _shake_dir : Vector2 = Vector2.ZERO
 var _look_offset_target : float = 0.0
+var _focus_point : Vector2 = Vector2.ZERO
+var _focus_active : bool = false
+var _focus_offset : Vector2 = Vector2.ZERO
+var _focus_goal : Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	zoom = base_zoom
@@ -63,6 +73,26 @@ func set_look_offset(y : float, instant : bool = false) -> void:
 	if instant:
 		look_offset_y = y
 
+## Lean a little towards a point of interest (the portal). The lean vector is
+## a fraction of the distance, clamped by `focus_max`, so the camera drifts in
+## the right direction instead of flying off to the target.
+func set_focus_point(world_pos : Vector2) -> void:
+	_focus_point = world_pos
+	_focus_active = true
+
+func clear_focus() -> void:
+	_focus_active = false
+
+func _update_focus(delta : float, player_pos : Vector2) -> void:
+	if _focus_active:
+		var to_point : Vector2 = _focus_point - player_pos
+		_focus_goal = to_point * focus_ratio
+		_focus_goal.x = clampf(_focus_goal.x, -focus_max.x, focus_max.x)
+		_focus_goal.y = clampf(_focus_goal.y, -focus_max.y, focus_max.y)
+	else:
+		_focus_goal = Vector2.ZERO
+	_focus_offset = _focus_offset.lerp(_focus_goal, clampf(focus_speed * delta, 0.0, 1.0))
+
 func add_trauma(amount : float, direction : Vector2 = Vector2.ZERO) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)
 	if direction.length() > 0.01:
@@ -80,7 +110,8 @@ func _physics_process(delta : float) -> void:
 			look.x = clampf(look.x, -look_ahead, look_ahead)
 			look.y = clampf(look.y, -look_ahead * 0.5, look_ahead * 0.5)
 		look_offset_y = lerpf(look_offset_y, _look_offset_target, clampf(look_offset_speed * delta, 0.0, 1.0))
-		var want : Vector2 = target.global_position + look + Vector2(0, look_offset_y)
+		_update_focus(delta, target.global_position)
+		var want : Vector2 = target.global_position + look + Vector2(0, look_offset_y) + _focus_offset
 		global_position = global_position.lerp(want, clampf(follow_speed * delta, 0.0, 1.0))
 
 	var shake : float = trauma * trauma

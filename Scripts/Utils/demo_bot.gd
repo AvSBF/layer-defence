@@ -82,7 +82,9 @@ func _collect_loot(delta : float) -> void:
 func _aim() -> void:
 	var target := _closest_enemy()
 	var aim := Vector2(1, 0)
-	if target != null:
+	if GameState.aim_lock.length() > 0.01:
+		aim = GameState.aim_lock.normalized()
+	elif target != null:
 		aim = (target.global_position - player.global_position).normalized()
 	_aim_angle = lerp_angle(_aim_angle, aim.angle(), 0.12)
 	if "aim_override" in player:
