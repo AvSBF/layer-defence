@@ -211,10 +211,15 @@ func _begin_reshape() -> void:
 	hint_changed.emit("THE ARENA IS SHIFTING…", true)
 	Pickup.vacuum_all()
 	await get_tree().create_timer(0.35).timeout
-	if _platforms != null and _platforms.has_method("reshuffle"):
-		_platforms.call("reshuffle")
 	_move_portal()
-	await get_tree().create_timer(reshape_time).timeout
+	# the arena only rebuilds every other round (and after every boss), so the
+	# player gets a short breather on the in-between waves
+	if GameState.wave % 2 == 0 or GameState.wave % 5 == 0:
+		if _platforms != null and _platforms.has_method("reshuffle"):
+			_platforms.call("reshuffle")
+		await get_tree().create_timer(reshape_time).timeout
+	else:
+		await get_tree().create_timer(reshape_time * 0.4).timeout
 	state = State.CLEARED
 	hint_changed.emit("STEP INTO THE GREEN GATE", true)
 	if _gate != null:
