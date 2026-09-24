@@ -69,6 +69,10 @@ func _ready() -> void:
 func _on_wave_changed(_wave : int, _is_boss : bool) -> void:
 	ward_ready = true
 
+func _reset_weapon_pose() -> void:
+	if not is_dead:
+		weapon_sprite.frame = 0
+
 func _build_sprite_frames() -> void:
 	sprite.sprite_frames = SheetAnim.build([
 		SheetAnim.sheet(ART + "player_idle.png", 16, 24, "idle", 6.0, true),
@@ -88,6 +92,8 @@ func equip(id : String) -> void:
 	weapon_sprite.sprite_frames = SheetAnim.build(WeaponCatalog.anim_specs(weapon_id))
 	weapon_sprite.play("swing")
 	weapon_sprite.stop()
+	if not weapon_sprite.animation_finished.is_connected(_reset_weapon_pose):
+		weapon_sprite.animation_finished.connect(_reset_weapon_pose)
 	GameState.notice.emit("EQUIPPED " + str(weapon["name"]), Color("#ffd34d"))
 	if GameState.autotest:
 		print("[autotest] equipped ", weapon_id)

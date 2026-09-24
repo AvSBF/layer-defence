@@ -561,7 +561,6 @@ func _die() -> void:
 	if is_dead:
 		return
 	is_dead = true
-	GameState.register_kill(coin_drop)
 	FX.play("death", global_position + Vector2(0, -6), {"scale": float(data.get("scale", 1.0))})
 	Audio.play("enemy_die", 0.15, -3.0)
 	if not boss:
@@ -572,6 +571,7 @@ func _die() -> void:
 	_die_anim()
 
 func _die_common(drop_loot : bool) -> void:
+	GameState.register_kill(coin_drop)
 	remove_from_group("enemy")
 	collision_layer = 0
 	collision_mask = 1

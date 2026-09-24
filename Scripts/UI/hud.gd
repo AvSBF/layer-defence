@@ -24,7 +24,8 @@ var _gate_hint : HBoxContainer
 var _heart_frames : Array[AtlasTexture] = []
 var _shown_coins : int = 0
 var _coin_tween : Tween
-var _hearts_used : int = 0
+var _hearts_used : int = -1
+var _prev_health : int = -1
 var _boss_max : float = 1.0
 
 func _ready() -> void:
@@ -201,13 +202,21 @@ func _sync_hearts() -> void:
 			t.texture = _heart_frames[2]
 			_hearts_box.add_child(t)
 			_heart_nodes.append(t)
+	if total != _hearts_used:
+		_hearts_used = total
+		return
 	for i in _heart_nodes.size():
 		var filled := i < GameState.health
 		_heart_nodes[i].texture = _heart_frames[0] if filled else _heart_frames[2]
-		if not filled:
-			_heart_nodes[i].modulate = Color(1, 1, 1, 0.35)
-		else:
-			_heart_nodes[i].modulate = Color.WHITE
+		_heart_nodes[i].modulate = Color.WHITE if filled else Color(1, 1, 1, 0.35)
+		# pop the heart that was just lost / gained
+		if _prev_health >= 0 and filled != (i < _prev_health):
+			var t := _heart_nodes[i]
+			t.pivot_offset = Vector2(HEART_SIZE, 10) * 0.5
+			t.scale = Vector2(1.7, 1.7)
+			var tw := create_tween()
+			tw.tween_property(t, "scale", Vector2.ONE, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_prev_health = GameState.health
 
 func _sync_dash() -> void:
 	for c in _dash_box.get_children():
