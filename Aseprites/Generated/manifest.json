@@ -1,0 +1,682 @@
+{
+ "Bosses/demon_lord_attack.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 2
+ },
+ "Bosses/demon_lord_death.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 7
+ },
+ "Bosses/demon_lord_idle.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 4
+ },
+ "Bosses/demon_lord_run.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 4
+ },
+ "Bosses/demon_lord_slam.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 1
+ },
+ "Bosses/necromancer_attack.png": {
+  "frame_h": 34,
+  "frame_w": 24,
+  "frames": 2
+ },
+ "Bosses/necromancer_death.png": {
+  "frame_h": 34,
+  "frame_w": 24,
+  "frames": 7
+ },
+ "Bosses/necromancer_idle.png": {
+  "frame_h": 34,
+  "frame_w": 24,
+  "frames": 4
+ },
+ "Bosses/necromancer_run.png": {
+  "frame_h": 34,
+  "frame_w": 24,
+  "frames": 4
+ },
+ "Bosses/necromancer_summon.png": {
+  "frame_h": 34,
+  "frame_w": 24,
+  "frames": 2
+ },
+ "Bosses/slime_king_attack.png": {
+  "frame_h": 32,
+  "frame_w": 40,
+  "frames": 2
+ },
+ "Bosses/slime_king_death.png": {
+  "frame_h": 32,
+  "frame_w": 40,
+  "frames": 7
+ },
+ "Bosses/slime_king_idle.png": {
+  "frame_h": 32,
+  "frame_w": 40,
+  "frames": 4
+ },
+ "Bosses/slime_king_run.png": {
+  "frame_h": 32,
+  "frame_w": 40,
+  "frames": 4
+ },
+ "Characters/player_dash.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Characters/player_death.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Characters/player_fall.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Characters/player_hurt.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Characters/player_idle.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Characters/player_jump.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Characters/player_run.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/bat_attack.png": {
+  "frame_h": 12,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/bat_death.png": {
+  "frame_h": 12,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/bat_idle.png": {
+  "frame_h": 12,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/bat_run.png": {
+  "frame_h": 12,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/bomber_attack.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Enemies/bomber_death.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 5
+ },
+ "Enemies/bomber_idle.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/bomber_run.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/ghost_attack.png": {
+  "frame_h": 20,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/ghost_death.png": {
+  "frame_h": 20,
+  "frame_w": 16,
+  "frames": 5
+ },
+ "Enemies/ghost_idle.png": {
+  "frame_h": 20,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/ghost_run.png": {
+  "frame_h": 20,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/golem_attack.png": {
+  "frame_h": 28,
+  "frame_w": 24,
+  "frames": 2
+ },
+ "Enemies/golem_death.png": {
+  "frame_h": 28,
+  "frame_w": 24,
+  "frames": 6
+ },
+ "Enemies/golem_idle.png": {
+  "frame_h": 28,
+  "frame_w": 24,
+  "frames": 4
+ },
+ "Enemies/golem_run.png": {
+  "frame_h": 28,
+  "frame_w": 24,
+  "frames": 4
+ },
+ "Enemies/golem_slam.png": {
+  "frame_h": 28,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "Enemies/imp_attack.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/imp_death.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/imp_idle.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/imp_run.png": {
+  "frame_h": 22,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/mage_attack.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/mage_death.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/mage_idle.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/mage_run.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/orc_attack.png": {
+  "frame_h": 24,
+  "frame_w": 18,
+  "frames": 2
+ },
+ "Enemies/orc_charge.png": {
+  "frame_h": 24,
+  "frame_w": 18,
+  "frames": 1
+ },
+ "Enemies/orc_death.png": {
+  "frame_h": 24,
+  "frame_w": 18,
+  "frames": 6
+ },
+ "Enemies/orc_idle.png": {
+  "frame_h": 24,
+  "frame_w": 18,
+  "frames": 4
+ },
+ "Enemies/orc_run.png": {
+  "frame_h": 24,
+  "frame_w": 18,
+  "frames": 4
+ },
+ "Enemies/skeleton_attack.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/skeleton_death.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/skeleton_idle.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/skeleton_run.png": {
+  "frame_h": 24,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/slime_attack.png": {
+  "frame_h": 14,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "Enemies/slime_death.png": {
+  "frame_h": 14,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/slime_idle.png": {
+  "frame_h": 14,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "Enemies/slime_run.png": {
+  "frame_h": 14,
+  "frame_w": 16,
+  "frames": 6
+ },
+ "Enemies/spider_attack.png": {
+  "frame_h": 14,
+  "frame_w": 20,
+  "frames": 2
+ },
+ "Enemies/spider_death.png": {
+  "frame_h": 14,
+  "frame_w": 20,
+  "frames": 5
+ },
+ "Enemies/spider_idle.png": {
+  "frame_h": 14,
+  "frame_w": 20,
+  "frames": 2
+ },
+ "Enemies/spider_run.png": {
+  "frame_h": 14,
+  "frame_w": 20,
+  "frames": 4
+ },
+ "FX/coin_pop.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "FX/death.png": {
+  "frame_h": 20,
+  "frame_w": 20,
+  "frames": 5
+ },
+ "FX/dust.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "FX/dust_big.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "FX/explosion.png": {
+  "frame_h": 36,
+  "frame_w": 36,
+  "frames": 6
+ },
+ "FX/freeze_spark.png": {
+  "frame_h": 18,
+  "frame_w": 18,
+  "frames": 4
+ },
+ "FX/heal.png": {
+  "frame_h": 18,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "FX/hit.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 4
+ },
+ "FX/shockwave.png": {
+  "frame_h": 24,
+  "frame_w": 48,
+  "frames": 4
+ },
+ "FX/slash_gold.png": {
+  "frame_h": 36,
+  "frame_w": 36,
+  "frames": 4
+ },
+ "FX/slash_magic.png": {
+  "frame_h": 36,
+  "frame_w": 36,
+  "frames": 4
+ },
+ "FX/slash_steel.png": {
+  "frame_h": 36,
+  "frame_w": 36,
+  "frames": 4
+ },
+ "FX/spawn.png": {
+  "frame_h": 26,
+  "frame_w": 26,
+  "frames": 4
+ },
+ "FX/telegraph.png": {
+  "frame_h": 20,
+  "frame_w": 56,
+  "frames": 3
+ },
+ "FX/teleport.png": {
+  "frame_h": 26,
+  "frame_w": 24,
+  "frames": 4
+ },
+ "Pickups/coin.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 8
+ },
+ "Pickups/gem.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "Pickups/heart.png": {
+  "frame_h": 10,
+  "frame_w": 11,
+  "frames": 2
+ },
+ "Projectiles/arrow.png": {
+  "frame_h": 6,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Projectiles/bomb.png": {
+  "frame_h": 14,
+  "frame_w": 14,
+  "frames": 4
+ },
+ "Projectiles/bone.png": {
+  "frame_h": 8,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "Projectiles/fireball.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "Projectiles/ice_shard.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 1
+ },
+ "Projectiles/orb.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "Projectiles/shard.png": {
+  "frame_h": 10,
+  "frame_w": 10,
+  "frames": 1
+ },
+ "Projectiles/skull.png": {
+  "frame_h": 12,
+  "frame_w": 12,
+  "frames": 4
+ },
+ "Projectiles/web.png": {
+  "frame_h": 12,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "Props/portal.png": {
+  "frame_h": 64,
+  "frame_w": 48,
+  "frames": 6
+ },
+ "Props/portal_base.png": {
+  "frame_h": 16,
+  "frame_w": 64,
+  "frames": 1
+ },
+ "Props/pot.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "Props/pot_break.png": {
+  "frame_h": 24,
+  "frame_w": 32,
+  "frames": 5
+ },
+ "Props/wave_gate.png": {
+  "frame_h": 56,
+  "frame_w": 64,
+  "frames": 6
+ },
+ "UI/arrow.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 2
+ },
+ "UI/banner.png": {
+  "frame_h": 40,
+  "frame_w": 160,
+  "frames": 1
+ },
+ "UI/boss_bar_frame.png": {
+  "frame_h": 12,
+  "frame_w": 8,
+  "frames": 1
+ },
+ "UI/button.png": {
+  "frame_h": 16,
+  "frame_w": 32,
+  "frames": 3
+ },
+ "UI/card.png": {
+  "frame_h": 24,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "UI/crosshair.png": {
+  "frame_h": 20,
+  "frame_w": 20,
+  "frames": 1
+ },
+ "UI/cursor.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/heart.png": {
+  "frame_h": 10,
+  "frame_w": 11,
+  "frames": 3
+ },
+ "UI/icons/armor.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/attack_speed.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/boss.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/coin.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/crit.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/damage.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/dash.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/fire.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/health.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/ice.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/lifesteal.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/luck.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/magnet.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/pot.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/potion.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/reroll.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/shield.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/skull.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/speed.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/star.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/icons/weapon.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "UI/panel.png": {
+  "frame_h": 24,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "UI/slot.png": {
+  "frame_h": 40,
+  "frame_w": 40,
+  "frames": 1
+ },
+ "World/bush.png": {
+  "frame_h": 14,
+  "frame_w": 20,
+  "frames": 1
+ },
+ "World/ground_fill.png": {
+  "frame_h": 16,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "World/ground_top.png": {
+  "frame_h": 10,
+  "frame_w": 16,
+  "frames": 1
+ },
+ "World/hills_far.png": {
+  "frame_h": 140,
+  "frame_w": 480,
+  "frames": 1
+ },
+ "World/hills_mid.png": {
+  "frame_h": 120,
+  "frame_w": 480,
+  "frames": 1
+ },
+ "World/pillar.png": {
+  "frame_h": 72,
+  "frame_w": 24,
+  "frames": 1
+ },
+ "World/platform.png": {
+  "frame_h": 16,
+  "frame_w": 96,
+  "frames": 1
+ },
+ "World/platform_small.png": {
+  "frame_h": 16,
+  "frame_w": 48,
+  "frames": 1
+ },
+ "World/sky.png": {
+  "frame_h": 270,
+  "frame_w": 480,
+  "frames": 1
+ },
+ "World/torch.png": {
+  "frame_h": 20,
+  "frame_w": 10,
+  "frames": 4
+ }
+}
