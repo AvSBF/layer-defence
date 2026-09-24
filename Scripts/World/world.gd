@@ -46,20 +46,33 @@ func _ready() -> void:
 		_start_autotest()
 
 func _unhandled_input(event : InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo and event.physical_keycode == KEY_F10:
+		# attract mode / demo bot toggle
+		GameState.autotest = true
+		if not _run_active and title != null and title.visible:
+			title.call("_start")
+		_start_bot()
+		get_viewport().set_input_as_handled()
+		return
 	if event.is_action_pressed("interact") and _run_active:
 		if shop != null and not shop.call("is_open") and not get_tree().paused:
 			shop.call("open")
 			get_viewport().set_input_as_handled()
 
-func _start_autotest() -> void:
-	GameState.autotest = true
-	GameState.autotest_mortal = OS.get_cmdline_user_args().has("--mortal")
-	print("[autotest] starting demo bot")
+func _start_bot() -> void:
+	if has_node("DemoBot"):
+		return
 	var bot_script : GDScript = load("res://Scripts/Utils/demo_bot.gd")
 	var bot : Node = bot_script.new()
 	bot.name = "DemoBot"
 	add_child(bot)
 	bot.call("setup", self)
+
+func _start_autotest() -> void:
+	GameState.autotest = true
+	GameState.autotest_mortal = OS.get_cmdline_user_args().has("--mortal")
+	print("[autotest] starting demo bot")
+	_start_bot()
 	if OS.get_cmdline_user_args().has("--shots"):
 		_screenshot_loop()
 	for arg in OS.get_cmdline_user_args():

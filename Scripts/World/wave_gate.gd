@@ -66,6 +66,8 @@ func _process(delta : float) -> void:
 				"modulate": Color("#7fe6cf")})
 	else:
 		_charge = 0.0
+	if GameState.autotest and fmod(_t, 1.0) < delta:
+		print("[gate] active=%s inside=%s charge=%.2f pos=%s" % [str(active), str(_player_inside()), _charge, str(global_position)])
 	if _charge >= 1.0:
 		_charge = 0.0
 		active = false

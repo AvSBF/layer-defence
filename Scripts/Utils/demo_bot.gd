@@ -47,7 +47,7 @@ func _process(delta : float) -> void:
 				" player=", player.global_position)
 	_handle_shop(delta)
 	if wave_manager != null and wave_manager.is_between_waves():
-		_wait_at_gate()
+		_wait_at_gate(delta)
 		return
 	_holding = false
 	_move(delta)
@@ -79,18 +79,29 @@ func _move(delta : float) -> void:
 		_dash_timer = randf_range(1.4, 2.8)
 		_tap("dash")
 
-func _wait_at_gate() -> void:
-	_set_action("key_right", false)
-	_set_action("key_left", false)
+## Walks to the green gate like a player would (no teleporting, so the physics
+## overlap is genuinely earned) and then stands still until the wave starts.
+func _wait_at_gate(delta : float) -> void:
 	var gate := world.get_node_or_null("WaveGate")
 	if gate == null:
 		return
-	if not _holding:
-		_holding = true
-		player.global_position = gate.global_position
-		print("[autotest] holding at gate, player=", player.global_position, " gate=", gate.global_position,
-			" overlaps=", gate.get_overlapping_bodies().size(), " monitoring=", gate.monitoring,
-			" layers=", gate.collision_layer, "/", gate.collision_mask)
+	var dx : float = gate.global_position.x - player.global_position.x
+	var close : bool = absf(dx) < 8.0 and absf(gate.global_position.y - player.global_position.y) < 90.0
+	if close:
+		if not _holding:
+			_holding = true
+			print("[autotest] reached the gate at %.0f" % _t)
+		_set_action("key_right", false)
+		_set_action("key_left", false)
+		return
+	_holding = false
+	_set_action("key_right", dx > 0.0)
+	_set_action("key_left", dx < 0.0)
+	_jump_timer -= delta
+	if _jump_timer <= 0.0:
+		_jump_timer = 0.5
+		_tap("jump")
+		_tap("key_down")
 
 func _handle_shop(delta : float) -> void:
 	if shop == null or not shop.visible:

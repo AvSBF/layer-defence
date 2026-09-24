@@ -102,11 +102,11 @@ const TYPES := {
 	# ------------------------------------------------------------------ bosses
 	"slime_king": {
 		"name": "SLIME KING", "archetype": "boss_slime", "boss": true,
-		"hp": 360.0, "speed": 42.0, "damage": 2, "coins": 25, "weight": 0.0, "min_wave": 5,
+		"hp": 320.0, "speed": 42.0, "damage": 2, "coins": 25, "weight": 0.0, "min_wave": 5,
 		"sheet": "Bosses/slime_king_%s.png", "frame": Vector2i(40, 32), "scale": 1.0,
 		"body": Vector2(34, 26), "sprite_lift": 0.0,
 		"jump": 460.0, "attack_range": 30.0, "attack_cd": 1.6, "knockback_res": 0.95,
-		"slam_radius": 120.0, "slam_damage": 2, "summon_count": 3, "summon_cd": 7.0,
+		"slam_radius": 120.0, "slam_damage": 2, "summon_count": 2, "summon_cd": 9.0,
 		"fps": 7.0, "bar_color": Color("#5fd15f"),
 	},
 	"necromancer": {
@@ -116,7 +116,7 @@ const TYPES := {
 		"body": Vector2(18, 30), "sprite_lift": 0.0,
 		"attack_range": 340.0, "attack_cd": 2.0, "knockback_res": 0.9,
 		"projectile": "skull", "projectile_speed": 280.0, "projectile_damage": 2,
-		"keep_distance": 220.0, "teleport_cd": 4.0, "summon_count": 2, "summon_cd": 6.0,
+		"keep_distance": 220.0, "teleport_cd": 4.0, "summon_count": 2, "summon_cd": 7.5,
 		"fps": 8.0, "bar_color": Color("#8a6ae0"),
 	},
 	"demon_lord": {
@@ -127,7 +127,7 @@ const TYPES := {
 		"attack_range": 46.0, "attack_cd": 1.5, "knockback_res": 0.9,
 		"projectile": "fireball", "projectile_speed": 320.0, "projectile_damage": 2,
 		"charge_speed": 320.0, "charge_cd": 4.0, "slam_radius": 130.0, "slam_damage": 3,
-		"summon_count": 2, "summon_cd": 8.0,
+		"summon_count": 2, "summon_cd": 10.0,
 		"fps": 8.0, "bar_color": Color("#e05a4a"),
 	},
 }
