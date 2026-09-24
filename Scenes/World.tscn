@@ -1,203 +1,185 @@
-[gd_scene format=3 uid="uid://bk28shcxsyg0v"]
+[gd_scene load_steps=20 uid="uid://bk28shcxsyg0v" format=3]
 
-[ext_resource type="PackedScene" uid="uid://rwu0dmkncf1m" path="res://Resources/player.tscn" id="1_5cjrv"]
-[ext_resource type="Shape2D" uid="uid://cwbq8x2ejj2wx" path="res://Resources/World/Collision Shapes/floor_collision_shape.tres" id="2_j0p05"]
-[ext_resource type="Shape2D" uid="uid://dgvw5me1278xk" path="res://Resources/World/Collision Shapes/world_border_collision_shape.tres" id="3_5nsto"]
-[ext_resource type="PackedScene" uid="uid://d2dssq6sj0iyr" path="res://Resources/Prefabs/Platform.tscn" id="3_gjpho"]
-[ext_resource type="Script" uid="uid://b4xhwyp4ts64n" path="res://Scenes/world_camera_smoothing.gd" id="5_p70al"]
-[ext_resource type="Script" uid="uid://doc1oo7ol18cf" path="res://Scripts/Spawners/wave_spawner.gd" id="6_spawner"]
-[ext_resource type="Script" uid="uid://cabqy8p7cm0l4" path="res://Scripts/Spawners/spawn_area.gd" id="7_area"]
-[ext_resource type="Script" uid="uid://dws4kdbdrg8vw" path="res://Scripts/Spawners/enemy_wave.gd" id="7_ti1bm"]
-[ext_resource type="Resource" uid="uid://c80d6t3lmspff" path="res://Resources/Spawners/wave_1.tres" id="8_op4cu"]
-[ext_resource type="Script" uid="uid://153y2wxf1x7d" path="res://Scripts/Spawners/spawn_point.gd" id="8_point"]
-[ext_resource type="Script" uid="uid://cofk61bgusjo5" path="res://Scripts/cursor_position.gd" id="9_kn06e"]
-[ext_resource type="Texture2D" uid="uid://e7d40cprgtsn" path="res://Aseprites/Debug/Cursor.png" id="9_uo7di"]
+[ext_resource type="Script" path="res://Scripts/World/world.gd" id="1_world"]
+[ext_resource type="Script" path="res://Scripts/World/arena_camera.gd" id="2_cam"]
+[ext_resource type="PackedScene" path="res://Resources/Player/Player.tscn" id="3_player"]
+[ext_resource type="PackedScene" path="res://Resources/Prefabs/Platform.tscn" id="4_platform"]
+[ext_resource type="Script" path="res://Scripts/World/portal.gd" id="5_portal"]
+[ext_resource type="Script" path="res://Scripts/World/wave_gate.gd" id="6_gate"]
+[ext_resource type="Script" path="res://Scripts/World/wave_manager.gd" id="7_wave"]
+[ext_resource type="Script" path="res://Scripts/World/game_cursor.gd" id="8_cursor"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/HUD.tscn" id="9_hud"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Shop.tscn" id="10_shop"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/WaveBanner.tscn" id="11_banner"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/GameOver.tscn" id="12_over"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Title.tscn" id="13_title"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/sky.png" id="14_sky"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/hills_far.png" id="15_far"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/hills_mid.png" id="16_mid"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/ground_top.png" id="17_gtop"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/ground_fill.png" id="18_gfill"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/pillar.png" id="19_pillar"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/World/moon.png" id="20_moon"]
 
-[node name="Game" type="Node2D" unique_id=1272095099]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1400, 80)
 
-[node name="Player" parent="." unique_id=1528174240 instance=ExtResource("1_5cjrv")]
-position = Vector2(0, 15)
-move_speed = 400.0
-max_jump_hold = 0.4
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(24, 900)
 
-[node name="Floor" type="StaticBody2D" parent="." unique_id=671057657]
-position = Vector2(0, 191)
+[node name="World" type="Node2D"]
+script = ExtResource("1_world")
 
-[node name="ColorRect" type="ColorRect" parent="Floor" unique_id=54723674]
-offset_left = -2000.0
-offset_top = -152.0
-offset_right = 2000.0
-offset_bottom = 148.0
-mouse_filter = 2
-color = Color(0.23753911, 0.23753914, 0.23753908, 1)
+[node name="SkyLayer" type="CanvasLayer" parent="."]
+layer = -20
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=29822633]
-shape = ExtResource("2_j0p05")
-debug_color = Color(0, 0.6, 0.69803923, 0)
+[node name="Sky" type="Sprite2D" parent="SkyLayer"]
+position = Vector2(640, 380)
+scale = Vector2(1.75, 1.75)
+texture = ExtResource("14_sky")
 
-[node name="Platforms" type="Node2D" parent="." unique_id=1679185475]
+[node name="Moon" type="Sprite2D" parent="SkyLayer"]
+position = Vector2(1020, 130)
+scale = Vector2(2.4, 2.4)
+texture = ExtResource("20_moon")
 
-[node name="Platform" parent="Platforms" unique_id=9024594 instance=ExtResource("3_gjpho")]
-position = Vector2(0, -53)
+[node name="Background" type="Node2D" parent="."]
 
-[node name="Platform2" parent="Platforms" unique_id=220360253 instance=ExtResource("3_gjpho")]
-position = Vector2(-407, -53)
+[node name="Far" type="Sprite2D" parent="Background"]
+position = Vector2(0, -70)
+scale = Vector2(3.2, 3.2)
+texture = ExtResource("15_far")
 
-[node name="Platform3" parent="Platforms" unique_id=30454642 instance=ExtResource("3_gjpho")]
-position = Vector2(-754, -53)
+[node name="Mid" type="Sprite2D" parent="Background"]
+position = Vector2(0, -6)
+scale = Vector2(3.2, 3.2)
+texture = ExtResource("16_mid")
 
-[node name="Platform4" parent="Platforms" unique_id=1293858423 instance=ExtResource("3_gjpho")]
-position = Vector2(393, -53)
+[node name="Arena" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
 
-[node name="Platform5" parent="Platforms" unique_id=292471950 instance=ExtResource("3_gjpho")]
-position = Vector2(748, -53)
+[node name="FloorShape" type="CollisionShape2D" parent="Arena"]
+position = Vector2(0, 160)
+shape = SubResource("RectangleShape2D_floor")
 
-[node name="Platform6" parent="Platforms" unique_id=1347656933 instance=ExtResource("3_gjpho")]
-position = Vector2(579, -153)
+[node name="GroundTop" type="Sprite2D" parent="Arena"]
+texture_repeat = 1
+position = Vector2(-700, 110)
+centered = false
+texture = ExtResource("17_gtop")
+region_enabled = true
+region_rect = Rect2(0, 0, 1400, 10)
 
-[node name="Platform7" parent="Platforms" unique_id=733999845 instance=ExtResource("3_gjpho")]
-position = Vector2(-578, -153)
+[node name="GroundFill" type="Sprite2D" parent="Arena"]
+texture_repeat = 1
+position = Vector2(-700, 120)
+centered = false
+texture = ExtResource("18_gfill")
+region_enabled = true
+region_rect = Rect2(0, 0, 1400, 160)
 
-[node name="Borders" type="Node2D" parent="." unique_id=737562487]
+[node name="FloorLeft" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
 
-[node name="Border" type="StaticBody2D" parent="Borders" unique_id=897051661]
-position = Vector2(1500, -709)
-scale = Vector2(1, 5)
+[node name="Shape" type="CollisionShape2D" parent="FloorLeft"]
+position = Vector2(-662, -200)
+shape = SubResource("RectangleShape2D_wall")
 
-[node name="borderColor" type="ColorRect" parent="Borders/Border" unique_id=128847484]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -50.0
-offset_top = -150.0
-offset_right = 50.0
-offset_bottom = 150.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.32511863, 0.04106886, 0.08800968, 1)
+[node name="Visual" type="Sprite2D" parent="FloorLeft"]
+texture_repeat = 1
+position = Vector2(-674, -650)
+centered = false
+texture = ExtResource("19_pillar")
+region_enabled = true
+region_rect = Rect2(0, 0, 24, 900)
 
-[node name="borderCollision" type="CollisionShape2D" parent="Borders/Border" unique_id=197682682]
-shape = ExtResource("3_5nsto")
-debug_color = Color(0, 0.6, 0.69803923, 0)
+[node name="FloorRight" type="StaticBody2D" parent="."]
+collision_layer = 1
+collision_mask = 0
 
-[node name="Border2" type="StaticBody2D" parent="Borders" unique_id=2102931686]
-position = Vector2(-1500, -709)
-scale = Vector2(1, 5)
+[node name="Shape" type="CollisionShape2D" parent="FloorRight"]
+position = Vector2(662, -200)
+shape = SubResource("RectangleShape2D_wall")
 
-[node name="borderColor" type="ColorRect" parent="Borders/Border2" unique_id=488421897]
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -50.0
-offset_top = -150.0
-offset_right = 50.0
-offset_bottom = 150.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.32511863, 0.04106886, 0.08800968, 1)
+[node name="Visual" type="Sprite2D" parent="FloorRight"]
+texture_repeat = 1
+position = Vector2(650, -650)
+centered = false
+texture = ExtResource("19_pillar")
+region_enabled = true
+region_rect = Rect2(0, 0, 24, 900)
 
-[node name="borderCollision" type="CollisionShape2D" parent="Borders/Border2" unique_id=761424936]
-shape = ExtResource("3_5nsto")
-debug_color = Color(0, 0.6, 0.69803923, 0)
+[node name="Platforms" type="Node2D" parent="."]
 
-[node name="Camera2D" type="Camera2D" parent="." unique_id=152582392]
-light_mask = 3
-position = Vector2(0, -260)
-zoom = Vector2(0.6, 0.6)
-limit_enabled = false
-position_smoothing_enabled = true
-script = ExtResource("5_p70al")
+[node name="PlatformLeft" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(-240, 40)
+scale = Vector2(2, 1)
 
-[node name="Spawners" type="Node2D" parent="." unique_id=1361571916]
+[node name="PlatformRight" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(240, 40)
+scale = Vector2(2, 1)
 
-[node name="WaveSpawner" type="Node2D" parent="Spawners" unique_id=309757310 node_paths=PackedStringArray("target", "spawn_areas", "spawn_points")]
-script = ExtResource("6_spawner")
-waves = Array[ExtResource("7_ti1bm")]([ExtResource("8_op4cu")])
-target = NodePath("../../Player")
-spawn_areas = [NodePath("../LeftArea"), NodePath("../RightArea")]
-spawn_points = NodePath("../RegularSpawnPoints")
+[node name="PlatformFarLeft" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(-450, -40)
 
-[node name="LeftArea" type="Node2D" parent="Spawners" unique_id=65813441]
-script = ExtResource("7_area")
+[node name="PlatformFarRight" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(450, -40)
 
-[node name="SpawnPoint" type="Marker2D" parent="Spawners/LeftArea" unique_id=343069896]
-position = Vector2(-753, -92)
-script = ExtResource("8_point")
+[node name="PlatformTop" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(0, -100)
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/LeftArea" unique_id=1454889286]
-position = Vector2(-578, -194)
-script = ExtResource("8_point")
+[node name="Player" parent="." instance=ExtResource("3_player")]
+position = Vector2(0, 40)
 
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/LeftArea" unique_id=500614824]
-position = Vector2(-957, -8)
-script = ExtResource("8_point")
+[node name="Portal" type="Node2D" parent="."]
+position = Vector2(0, -300)
+script = ExtResource("5_portal")
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/LeftArea" unique_id=1058120619]
-position = Vector2(-1018, -8)
-script = ExtResource("8_point")
+[node name="WaveGate" type="Area2D" parent="."]
+position = Vector2(0, 92)
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("6_gate")
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/LeftArea" unique_id=29827835]
-position = Vector2(-1084, -9)
-script = ExtResource("8_point")
+[node name="Camera2D" type="Camera2D" parent="."]
+position = Vector2(0, 40)
+zoom = Vector2(2, 2)
+limit_left = -700
+limit_top = -450
+limit_right = 700
+limit_bottom = 340
+limit_smoothed = true
+script = ExtResource("2_cam")
+target_path = NodePath("../Player")
 
-[node name="RightArea" type="Node2D" parent="Spawners" unique_id=1717534065]
-script = ExtResource("7_area")
+[node name="Enemies" type="Node2D" parent="."]
 
-[node name="SpawnPoint" type="Marker2D" parent="Spawners/RightArea" unique_id=386001129]
-position = Vector2(747, -106)
-script = ExtResource("8_point")
+[node name="Pickups" type="Node2D" parent="."]
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RightArea" unique_id=1633373831]
-position = Vector2(581, -214)
-script = ExtResource("8_point")
+[node name="Pots" type="Node2D" parent="."]
 
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RightArea" unique_id=1877183112]
-position = Vector2(929, -15)
-script = ExtResource("8_point")
+[node name="FXHolder" type="Node2D" parent="."]
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RightArea" unique_id=791154691]
-position = Vector2(1005, -17)
-script = ExtResource("8_point")
+[node name="WaveManager" type="Node2D" parent="."]
+script = ExtResource("7_wave")
+portal_path = NodePath("../Portal")
+gate_path = NodePath("../WaveGate")
+enemy_holder_path = NodePath("../Enemies")
+pot_holder_path = NodePath("../Pots")
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RightArea" unique_id=194317165]
-position = Vector2(1087, -16)
-script = ExtResource("8_point")
+[node name="Cursor" type="Node2D" parent="."]
+script = ExtResource("8_cursor")
 
-[node name="RegularSpawnPoints" type="Node2D" parent="Spawners" unique_id=996268295]
+[node name="UI" type="Node2D" parent="."]
 
-[node name="SpawnPoint" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1901048351]
-position = Vector2(1378, -24)
-script = ExtResource("8_point")
+[node name="HUD" parent="UI" instance=ExtResource("9_hud")]
 
-[node name="SpawnPoint2" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=780988329]
-position = Vector2(1378, -114)
-script = ExtResource("8_point")
+[node name="Shop" parent="UI" instance=ExtResource("10_shop")]
 
-[node name="SpawnPoint3" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=462977602]
-position = Vector2(1378, -202)
-script = ExtResource("8_point")
+[node name="WaveBanner" parent="UI" instance=ExtResource("11_banner")]
 
-[node name="SpawnPoint4" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=646003529]
-position = Vector2(-1393, -229)
-script = ExtResource("8_point")
+[node name="GameOver" parent="UI" instance=ExtResource("12_over")]
 
-[node name="SpawnPoint5" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=755815000]
-position = Vector2(-1395, -128)
-script = ExtResource("8_point")
-
-[node name="SpawnPoint6" type="Marker2D" parent="Spawners/RegularSpawnPoints" unique_id=1389202833]
-position = Vector2(-1393, -33)
-script = ExtResource("8_point")
-
-[node name="Cursor" type="Node2D" parent="." unique_id=237535251]
-scale = Vector2(3, 3)
-script = ExtResource("9_kn06e")
-
-[node name="Cursor Sprite" type="Sprite2D" parent="Cursor" unique_id=1905857020]
-texture = ExtResource("9_uo7di")
+[node name="Title" parent="UI" instance=ExtResource("13_title")]

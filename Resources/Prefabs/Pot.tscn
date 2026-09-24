@@ -1,0 +1,16 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/World/pot.gd" id="1_pot"]
+[ext_resource type="Texture2D" path="res://Aseprites/Generated/Props/pot.png" id="2_pot_tex"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pot"]
+radius = 8.0
+
+[node name="Pot" type="CharacterBody2D" collision_layer="64" collision_mask="1"]
+script = ExtResource("1_pot")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("2_pot_tex")
+
+[node name="Shape" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_pot")

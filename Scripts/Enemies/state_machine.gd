@@ -15,7 +15,6 @@ func _ready() -> void:
 	var first_state = states.values().front()
 	if first_state:
 		current_state = first_state
-		print("[StateMachine] Initial state: ", current_state.name)
 		current_state.enter()
 
 func _process(delta : float) -> void:
@@ -29,10 +28,9 @@ func _physics_process(delta : float) -> void:
 func transition_to(new_state_name : String) -> void:
 	var new_state = states.get(new_state_name.to_lower())
 	if new_state and new_state != current_state:
-		print("[StateMachine] ", current_state.name, " -> ", new_state_name)
 		if current_state:
 			current_state.exit()
 		current_state = new_state
 		current_state.enter()
 	else:
-		print("[StateMachine] Could not find state: '", new_state_name, "' in states: ", states.keys())
+		push_warning("[StateMachine] Could not find state: '", new_state_name, "' in states: ", states.keys())
