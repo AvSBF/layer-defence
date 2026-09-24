@@ -7,9 +7,9 @@ from px import C, Img, alpha, blob, mix, rounded_rect, sheet, shift
 P = {
     "out": C("#140f1d"),
     "out_soft": C("#241a33"),
-    "steel": C("#7f8fa6"),
-    "steel_lit": C("#b8c6d9"),
-    "steel_drk": C("#4a5568"),
+    "steel": C("#96a9c4"),
+    "steel_lit": C("#d6e3f5"),
+    "steel_drk": C("#5d6c85"),
     "teal": C("#3fb8a2"),
     "teal_lit": C("#7fe6cf"),
     "teal_drk": C("#1f7a6d"),

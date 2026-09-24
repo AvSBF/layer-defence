@@ -66,6 +66,34 @@ class Img:
     def opaque(self, x, y):
         return self.get(x, y)[3] > 0
 
+    def blend(self, x, y, color):
+        """Alpha-composite `color` over whatever is already there."""
+        x = int(x)
+        y = int(y)
+        if x < 0 or y < 0 or x >= self.w or y >= self.h or color[3] == 0:
+            return
+        dst = self.px[y][x]
+        if dst[3] == 0:
+            self.px[y][x] = (color[0], color[1], color[2], color[3])
+            return
+        sa = color[3] / 255.0
+        da = dst[3] / 255.0
+        oa = sa + da * (1.0 - sa)
+        if oa <= 0.0:
+            return
+        out = []
+        for i in range(3):
+            out.append(int(round((color[i] * sa + dst[i] * da * (1.0 - sa)) / oa)))
+        self.px[y][x] = (out[0], out[1], out[2], int(round(oa * 255)))
+
+    def blend_ellipse(self, cx, cy, rx, ry, color):
+        for yy in range(int(cy - ry) - 1, int(cy + ry) + 2):
+            for xx in range(int(cx - rx) - 1, int(cx + rx) + 2):
+                dx = (xx - cx) / max(0.001, rx)
+                dy = (yy - cy) / max(0.001, ry)
+                if dx * dx + dy * dy <= 1.0:
+                    self.blend(xx, yy, color)
+
     def rect(self, x, y, w, h, color):
         x, y, w, h = int(round(x)), int(round(y)), int(round(w)), int(round(h))
         for yy in range(y, y + h):

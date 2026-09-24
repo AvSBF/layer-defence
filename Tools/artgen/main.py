@@ -16,11 +16,13 @@ import fx  # noqa: E402
 import px  # noqa: E402
 import sfx  # noqa: E402
 import ui  # noqa: E402
+import weapons  # noqa: E402
 import world  # noqa: E402
 
 
 def main():
     chars.build()
+    weapons.build()
     fx.build()
     ui.build()
     world.build()

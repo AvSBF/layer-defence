@@ -7,18 +7,18 @@ import random
 from px import C, Img, alpha, mix, sheet, single
 from chars import P
 
-SKY_TOP = C("#0b0a1e")
-SKY_MID = C("#241a4a")
-SKY_BOT = C("#4a2a5e")
-HILL_FAR = C("#2a2347")
-HILL_MID = C("#1e1a35")
-TREE = C("#171327")
-DIRT = C("#3a2a34")
-DIRT_LIT = C("#54404a")
-DIRT_DRK = C("#241a24")
-GRASS = C("#3f8f6a")
-GRASS_LIT = C("#5fc78f")
-GRASS_DRK = C("#2a6350")
+SKY_TOP = C("#241c52")
+SKY_MID = C("#4a3488")
+SKY_BOT = C("#b06a8a")
+HILL_FAR = C("#2a2350")
+HILL_MID = C("#1e1a3a")
+TREE = C("#1c1733")
+DIRT = C("#4b3644")
+DIRT_LIT = C("#6d5260")
+DIRT_DRK = C("#2f2130")
+GRASS = C("#51b083")
+GRASS_LIT = C("#7fe0a8")
+GRASS_DRK = C("#357a60")
 STONE = C("#5a5266")
 STONE_LIT = C("#7d7488")
 STONE_DRK = C("#3a3444")
@@ -35,24 +35,50 @@ def sky(w=480, h=270):
         for x in range(w):
             img.set(x, y, c)
     rnd = random.Random(2024)
-    for _ in range(120):
+    for _ in range(150):
         x = rnd.randrange(w)
-        y = rnd.randrange(int(h * 0.7))
-        b = rnd.choice([160, 200, 235, 255])
-        img.set(x, y, alpha(C("#dfe6ff"), b))
-    # moon
-    mx, my = 380, 48
-    img.circle(mx, my, 22, alpha(C("#7fe6cf"), 40))
-    img.circle(mx, my, 16, C("#e8f4ff"))
-    img.circle(mx - 5, my - 4, 4, C("#c9d8ea"))
-    img.circle(mx + 6, my + 5, 3, C("#c9d8ea"))
-    img.circle(mx + 2, my - 8, 2, C("#c9d8ea"))
-    # nebula wisps
-    for _ in range(14):
+        y = rnd.randrange(int(h * 0.62))
+        b = rnd.choice([170, 210, 240, 255])
+        img.blend(x, y, alpha(C("#eaf0ff"), b))
+    for _ in range(18):
+        x = rnd.randrange(w)
+        y = rnd.randrange(int(h * 0.55))
+        s2 = C("#ffffff")
+        img.blend(x, y, alpha(s2, 255))
+        img.blend(x + 1, y, alpha(s2, 140))
+        img.blend(x, y + 1, alpha(s2, 140))
+        img.blend(x - 1, y, alpha(s2, 110))
+    for _ in range(16):
         x = rnd.randrange(w)
         y = rnd.randrange(int(h * 0.5))
-        rr = rnd.randrange(20, 60)
-        img.ellipse(x, y, rr, rr * 0.25, alpha(C("#6b4fa0"), 14))
+        rr = rnd.randrange(20, 70)
+        img.blend_ellipse(x, y, rr, rr * 0.28, alpha(C("#9a6fd0"), 26))
+    return img
+
+
+def moon(size=48):
+    img = Img(size, size)
+    cx = cy = (size - 1) / 2
+    img.circle(cx, cy, size * 0.5 - 1, alpha(C("#9fd8ff"), 26))
+    img.circle(cx, cy, size * 0.42, alpha(C("#cfeaff"), 48))
+    img.circle(cx, cy, size * 0.33, C("#eef6ff"))
+    img.circle(cx, cy, size * 0.30, C("#f8fbff"))
+    for (dx, dy, r) in ((-4, -5, 3), (5, 4, 2.4), (1, -8, 2), (-7, 3, 2), (7, -3, 1.6)):
+        img.circle(cx + dx, cy + dy, r, C("#ccdcee"))
+    img.circle(cx - 2, cy - 2, size * 0.12, C("#ffffff"))
+    return img
+
+
+def _rim_light(img, color):
+    """Light the topmost opaque pixel of every column - silhouettes read much
+    better against the sky with a 1px rim."""
+    for x in range(img.w):
+        for y in range(img.h):
+            if img.px[y][x][3] > 0:
+                img.px[y][x] = color
+                if y + 1 < img.h and img.px[y + 1][x][3] > 0:
+                    img.px[y + 1][x] = mix(img.px[y + 1][x], color, 0.45)
+                break
     return img
 
 
@@ -74,6 +100,7 @@ def hills_far(w=480, h=140):
         for x in range(w):
             if img.px[y][x][3] > 0 and (x + y) % 5 == 0:
                 img.px[y][x] = mix(img.px[y][x], C("#3a3560"), 0.5)
+    _rim_light(img, C("#5f4f9a"))
     return img
 
 
@@ -95,6 +122,7 @@ def hills_mid(w=480, h=120):
         y = rnd.randrange(h - 45, h - 8)
         th = rnd.randrange(12, 26)
         _tree(img, x, y, th, rnd)
+    _rim_light(img, C("#3d3268"))
     return img
 
 
@@ -191,7 +219,8 @@ def torch_frames():
 
 
 def build():
-    single(sky(), "World/sky.png")
+    single(sky(1024, 512), "World/sky.png")
+    single(moon(), "World/moon.png")
     single(hills_far(), "World/hills_far.png")
     single(hills_mid(), "World/hills_mid.png")
     top, filler = ground_tiles()
