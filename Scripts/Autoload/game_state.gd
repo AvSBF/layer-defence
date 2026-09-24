@@ -62,6 +62,7 @@ var time_alive : float = 0.0
 var autotest : bool = false
 var autotest_mortal : bool = false
 var aim_lock : Vector2 = Vector2.ZERO
+var shop_demo : bool = false
 
 ## Set by the world so GameState can heal / revive / kill the player.
 var player : Node = null

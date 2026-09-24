@@ -152,11 +152,13 @@ func _populate() -> void:
 	for n in _card_nodes:
 		n.queue_free()
 	_card_nodes.clear()
-	_refresh_coins()
 	for i in _offers.size():
 		var card := _build_card(_offers[i], i)
 		_cards_box.add_child(card)
 		_card_nodes.append(card)
+	# refresh *after* the cards exist, otherwise prices never leave their
+	# construction defaults
+	_refresh_coins()
 
 func _build_card(offer : Dictionary, index : int) -> Control:
 	var holder := Control.new()
@@ -218,7 +220,22 @@ func _build_card(offer : Dictionary, index : int) -> Control:
 	spacer.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	box.add_child(spacer)
 
-	var cost_text := "EQUIP" if is_weapon else "BUY  %d" % GameState.upgrade_cost(data)
+	# --- explicit price row: the cost must be readable *before* buying, so it
+	# lives on the card and not inside the button label
+	var price_row := HBoxContainer.new()
+	price_row.name = "PriceRow"
+	price_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	price_row.add_theme_constant_override("separation", 6)
+	box.add_child(price_row)
+	var coin_icon := PixelUI.icon_rect("coin", 20)
+	coin_icon.name = "PriceCoin"
+	price_row.add_child(coin_icon)
+	var price_label := PixelUI.label("0", PixelUI.NORMAL, PixelUI.COL_GOLD)
+	price_label.name = "PriceLabel"
+	price_label.custom_minimum_size = Vector2(56, 0)
+	price_row.add_child(price_label)
+
+	var cost_text := "EQUIP" if is_weapon else "BUY"
 	var buy := PixelUI.button(cost_text, PixelUI.SMALL)
 	buy.name = "BuyButton"
 	buy.set_meta("offer", offer)
@@ -360,15 +377,35 @@ func _refresh_coins() -> void:
 			btn = found
 		if btn == null:
 			continue
+		var price_label : Label = null
+		var price_found := card.find_child("PriceLabel", true, false)
+		if price_found is Label:
+			price_label = price_found
+		var price_row : Control = null
+		var row_found := card.find_child("PriceRow", true, false)
+		if row_found is Control:
+			price_row = row_found
 		if offer["type"] == "sold":
 			btn.text = "SOLD"
 			btn.disabled = true
+			if price_row != null:
+				price_row.visible = false
 			continue
 		var cost := _cost_of(offer)
 		# never hard-disable: a click on an unaffordable card must explain
 		# itself ("NOT ENOUGH COINS") instead of doing nothing
 		var affordable : bool = GameState.coins >= cost
 		btn.modulate = Color.WHITE if affordable else Color(0.55, 0.55, 0.65)
+		if price_row != null:
+			price_row.visible = true
+		if price_label != null:
+			if cost <= 0:
+				price_label.text = "FREE"
+				price_label.add_theme_color_override("font_color", PixelUI.COL_GOOD)
+			else:
+				price_label.text = str(cost)
+				price_label.add_theme_color_override("font_color",
+					PixelUI.COL_GOLD if affordable else Color(1.0, 0.5, 0.45))
 		if offer["type"] == "weapon":
 			var equipped_now : bool = (GameState.player != null
 				and is_instance_valid(GameState.player)
@@ -377,9 +414,9 @@ func _refresh_coins() -> void:
 				btn.text = "EQUIPPED"
 				btn.modulate = Color(0.75, 1.0, 0.85)
 			else:
-				btn.text = "EQUIP  %d" % cost
+				btn.text = "EQUIP"
 		else:
-			btn.text = "BUY  %d" % cost
+			btn.text = "BUY"
 
 func _on_coins_changed(_total : int, _delta : int) -> void:
 	if _is_open:

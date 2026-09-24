@@ -82,6 +82,9 @@ func _start_autotest() -> void:
 				shot_interval = maxf(0.1, float(arg.split("=")[1]))
 	if shot_interval > 0.0:
 		_screenshot_loop(shot_interval)
+	if OS.get_cmdline_user_args().has("--shopdemo"):
+		GameState.shop_demo = true
+		_open_shop_for_demo()
 	if OS.get_cmdline_user_args().has("--batcheck"):
 		for i in 3:
 			SpawnHelper.spawn_enemy(self, "bat", Vector2(-220.0 + i * 220.0, -150.0), 3, false)
@@ -118,6 +121,12 @@ func _screenshot_loop(interval : float = 2.0) -> void:
 			img.save_png("user://shot_%02d.png" % shot)
 			print("[autotest] saved screenshot %d" % shot)
 		shot += 1
+
+func _open_shop_for_demo() -> void:
+	await get_tree().create_timer(1.5, true, false, true).timeout
+	GameState.add_coins(120)
+	if shop != null:
+		shop.call("open")
 
 func _on_start_requested() -> void:
 	_dbg("run started")

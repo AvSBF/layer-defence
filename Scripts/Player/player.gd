@@ -55,6 +55,9 @@ var _swing_token : int = 0
 
 func _ready() -> void:
 	add_to_group("player")
+	# world layering: background/ground at 0, aim helper at 1, the knight at 2,
+	# pickups/props above that, enemies on top
+	z_index = 2
 	GameState.player = self
 	shape.shape = RectangleShape2D.new()
 	(shape.shape as RectangleShape2D).size = Vector2(11, 30)

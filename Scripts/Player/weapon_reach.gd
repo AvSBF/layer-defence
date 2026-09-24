@@ -12,7 +12,9 @@ var player : Player
 
 func _ready() -> void:
 	player = get_parent() as Player
-	z_index = -1
+	# drawn above the ground/hills but under the knight, so it never gets
+	# swallowed by the parallax background
+	z_index = 1
 	z_as_relative = false
 	queue_redraw()
 

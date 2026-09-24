@@ -132,6 +132,8 @@ func _wait_at_gate(delta : float) -> void:
 		_tap("key_down")
 
 func _handle_shop(delta : float) -> void:
+	if GameState.shop_demo:
+		return
 	if shop == null or not shop.visible:
 		_shop_timer = 0.0
 		return
