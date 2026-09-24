@@ -558,6 +558,16 @@ params.collision_mask = ENEMY_LAYER | BREAKABLE_LAYER
     <span class="kw">var</span> offset := (<span class="kw">float</span>(i) - (count - <span class="nm">1</span>) * <span class="nm">0.5</span>) * <span class="nm">0.09</span>  <span class="cm"># веер в радианах</span>
     spawn_projectile(..., <span class="tp">Vector2</span>.from_angle(aim.angle() + offset), ...)</div>
         <p>Тяжёлое оружие добавляет <code>stun</code> цели, лайфстил лечит целыми единицами (накопитель <code>lifesteal_pool</code>), а крит даёт <code>hitstop</code> — поэтому разные оружия ощущаются по-разному, хотя код один.</p>
+        <h4>Почему снаряды не проходят сквозь стены: sweep-raycast</h4>
+        <p>Проверки перекрытий (<code>get_overlapping_bodies</code>) обновляются раз в физический тик, а стрела летит 760 px/s — это 12–13 px за кадр. На просадке FPS шаг становится больше толщины стены, и снаряд телепортируется сквозь неё; кроме того, он успевал «утопиться» в стену на 20 px до срабатывания оверлепа. Поэтому каждый кадр пройденный отрезок пути проверяется лучом:</p>
+        <div class="code"><span class="kw">var</span> previous := global_position
+global_position += direction * speed * delta
+<span class="kw">var</span> params := <span class="tp">PhysicsRayQueryParameters2D</span>.create(previous, global_position, TERRAIN_MASK)
+<span class="kw">var</span> hit := space.intersect_ray(params)
+<span class="kw">if</span> <span class="kw">not</span> hit.is_empty():
+    global_position = hit.position      <span class="cm"># ровно точка касания</span>
+    _despawn(<span class="kw">true</span>)                    <span class="cm"># вспышка + звук в точке удара</span></div>
+        <p><code>TERRAIN_MASK = 1 | 2</code> — стены, пол и платформы. Это классический приём для любых быстрых снарядов: телепортации не бывает, а эффект попадания всегда оказывается ровно на поверхности.</p>
     </div>
 
     <!-- ======================================================= 16 -->

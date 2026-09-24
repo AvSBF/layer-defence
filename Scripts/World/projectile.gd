@@ -18,6 +18,11 @@ const INFO := {
 	"ice_shard": ["ice_shard.png", 12, 12, 12.0, "spin"],
 }
 
+## Solid geometry a projectile cannot pass: world walls, floor and platforms.
+## Platforms are one-way slabs, so only the segment test against layer 1+2 is
+## used for the "did we hit a wall" question.
+const TERRAIN_MASK := 1 | 2
+
 @export var kind : String = "arrow"
 @export var friendly : bool = false          ## friendly = hurts enemies
 @export var damage : float = 10.0
@@ -69,6 +74,7 @@ func _physics_process(delta : float) -> void:
 	if _age >= lifetime:
 		_despawn(false)
 		return
+	var previous : Vector2 = global_position
 	var info : Array = INFO.get(kind, INFO["arrow"])
 	var motion : String = str(info[4])
 	if motion == "homing" and homing_strength > 0.0:
@@ -88,7 +94,30 @@ func _physics_process(delta : float) -> void:
 		direction = direction.normalized()
 		rotation = direction.angle()
 	global_position += direction * speed * delta
+	# sweep the travelled segment for solid terrain: an arrow at 760 px/s can
+	# cross a 24 px wall in a single frame, and overlap checks alone would let
+	# it tunnel through (or stop 20 px deep inside it)
+	if _sweep_terrain(previous):
+		return
 	_check_hits()
+
+## Returns true when the projectile hit a wall / the floor and removed itself.
+func _sweep_terrain(from : Vector2) -> bool:
+	var space := get_world_2d().direct_space_state
+	if space == null:
+		return false
+	var params := PhysicsRayQueryParameters2D.create(from, global_position, TERRAIN_MASK)
+	params.exclude = [get_rid()]
+	params.collide_with_areas = false
+	params.collide_with_bodies = true
+	var hit := space.intersect_ray(params)
+	if hit.is_empty():
+		return false
+	global_position = hit.position
+	if GameState.autotest:
+		print("[proj] %s stopped by terrain at %s" % [kind, str(global_position.round())])
+	_despawn(true)
+	return true
 
 func _find_target() -> Node2D:
 	if _target_provider.is_valid():
@@ -109,7 +138,7 @@ func _check_hits() -> void:
 		if _hits.has(body):
 			continue
 		if body is StaticBody2D:
-			# terrain: projectiles stop on walls, platforms and the floor
+			# fallback for the rare case of spawning already inside geometry
 			_despawn(true)
 			return
 		if friendly:
