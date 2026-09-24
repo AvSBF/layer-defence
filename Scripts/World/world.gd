@@ -76,6 +76,10 @@ func _start_autotest() -> void:
 	_start_bot()
 	if OS.get_cmdline_user_args().has("--shots"):
 		_screenshot_loop()
+	if OS.get_cmdline_user_args().has("--pots"):
+		for i in 5:
+			var x := -560.0 + i * 280.0
+			Pot.spawn(self, Vector2(x, -200.0), 140.0, "chest" if i == 2 else "pot")
 	for arg in OS.get_cmdline_user_args():
 		if arg.begins_with("--weapon="):
 			var wanted : String = arg.split("=")[1]

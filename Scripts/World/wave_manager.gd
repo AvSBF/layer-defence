@@ -244,7 +244,9 @@ func _spawn_breakable() -> void:
 		x = rng.randf_range(-520.0, 520.0)
 	var pos := Vector2(clampf(x, -620.0, 620.0), -430.0)
 	var kind := "chest" if rng.randf() < 0.14 else "pot"
-	Pot.spawn(_pot_holder, pos, rng.randf_range(120.0, 220.0), kind)
+	var b := Pot.spawn(_pot_holder, pos, rng.randf_range(120.0, 220.0), kind)
+	if GameState.autotest:
+		print("[autotest] dropping %s at %s (holder=%s)" % [kind, str(pos), str(_pot_holder)])
 
 func _pot_tick(delta : float) -> void:
 	if state != State.FIGHTING and state != State.SPAWNING:
