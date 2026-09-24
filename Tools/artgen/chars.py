@@ -123,33 +123,37 @@ def player_frames():
 
 
 def _knight(pal, bob=0, arm=0, leg=(0, 0), cape=0, tilt=0, tint=None):
-    """16x24 knight. arm/leg are pixel offsets, bob shifts the torso up."""
+    """16x24 knight in profile facing right. arm/leg are pixel offsets,
+    bob lifts the torso, cape shifts the cloth behind the body."""
     img = Img(16, 24)
     base_y = 23
-    # --- legs
-    for i, off in enumerate(leg):
-        lx = 4 + i * 6
-        _limb(img, lx + off, base_y - 6, 3, 6, pal["body_drk"], pal["out"])
-        img.rect(lx + off - 1, base_y - 1, 5, 1, P["out"])
-    # --- cape behind
+    # --- cape behind (asymmetric: it drags to the left / backwards)
     if cape != 0:
-        img.rect(6 + cape, 7, 5, 12, pal["cloth_drk"])
-    # --- torso
+        img.rect(4 + cape, 7, 6, 12, pal["cloth_drk"])
+        img.rect(4 + cape, 7, 6, 1, pal["cloth"])
+    # --- back leg then front leg (front leg is 1px lighter = depth)
+    back_off, front_off = leg
+    _limb(img, 4 + back_off, base_y - 6, 3, 6, pal["body_drk"], pal["out"])
+    img.rect(3 + back_off, base_y - 1, 5, 1, P["out"])
+    _limb(img, 7 + front_off, base_y - 6, 3, 6, pal["body"], pal["out"])
+    img.rect(6 + front_off, base_y - 1, 5, 1, P["out"])
+    # --- torso (leaning slightly forward)
     ty = 8 - bob
-    tx = 4
-    torso = body_box(pal, tx, ty, 8, 9, lit=True)
-    img.paste(torso, tx, ty)
-    # belt
-    img.rect(tx, ty + 7, 8, 1, P["wood_drk"])
-    img.rect(tx + 3, ty + 7, 2, 1, P["gold"])
-    # chest emblem
-    img.set(8, ty + 3, P["cyan"])
-    img.set(7, ty + 4, P["cyan"])
-    img.set(9, ty + 4, P["cyan"])
-    # --- arms
-    _limb(img, 2 + arm, ty + 1, 3, 7, pal["body"], pal["out"])
-    _limb(img, 11 - arm, ty + 1, 3, 7, pal["body"], pal["out"])
-    # --- head
+    torso = body_box(pal, 0, 0, 7, 9, lit=True)
+    img.paste(torso, 5, ty)
+    img.rect(5, ty + 7, 7, 1, P["wood_drk"])
+    img.rect(8, ty + 7, 2, 1, P["gold"])
+    # chest emblem shifted to the front side
+    img.set(10, ty + 3, P["cyan"])
+    img.set(11, ty + 4, P["cyan"])
+    img.set(10, ty + 5, P["cyan"])
+    # --- back arm (behind the torso) and front arm (holds the weapon)
+    _limb(img, 4 + arm, ty + 2, 2, 6, pal["body_drk"], pal["out"])
+    _limb(img, 11 - arm, ty + 1, 2, 6, pal["body"], pal["out"])
+    # shield on the back arm
+    img.rect(3 + arm, ty + 2, 2, 5, pal["cloth"])
+    img.rect(3 + arm, ty + 2, 2, 1, pal["cloth_lit"])
+    # --- head, facing right
     img.paste(_knight_head(pal), 4 + tilt, ty - 7)
     if tint:
         img = _tint(img, tint)
@@ -158,22 +162,27 @@ def _knight(pal, bob=0, arm=0, leg=(0, 0), cape=0, tilt=0, tint=None):
 
 
 def _knight_head(pal):
-    img = Img(8, 8)
+    """Helmet drawn in profile facing right, so flipping actually reads."""
+    img = Img(9, 8)
+    # skull of the helmet, shifted right = facing direction
     img.rect(1, 1, 6, 6, pal["body"])
     img.rect(1, 1, 6, 1, pal["body_lit"])
-    img.rect(0, 2, 8, 3, pal["body"])
-    img.rect(0, 2, 8, 1, pal["body_lit"])
-    # visor
-    img.rect(2, 4, 4, 2, P["out"])
-    img.set(3, 4, pal["eye"])
-    img.set(4, 4, pal["eye"])
-    # cheek/chin
-    img.rect(2, 6, 4, 1, pal["body_drk"])
-    # plume
-    img.set(3, 0, pal["cloth"])
-    img.set(4, 0, pal["cloth_lit"])
-    img.set(5, 0, pal["cloth"])
-    img.set(4, -1 if False else 0, pal["cloth_lit"])
+    img.rect(1, 1, 1, 6, pal["body_lit"])
+    img.rect(6, 2, 1, 5, pal["body_drk"])
+    # snout / visor sticking out to the right
+    img.rect(6, 3, 3, 3, pal["body"])
+    img.rect(6, 3, 3, 1, pal["body_lit"])
+    img.rect(8, 4, 1, 1, pal["body_drk"])
+    # dark visor slit with a single glowing eye
+    img.rect(5, 4, 4, 1, P["out"])
+    img.set(7, 4, pal["eye"])
+    # chin / jaw
+    img.rect(3, 7, 4, 1, pal["body_drk"])
+    img.rect(6, 6, 3, 1, pal["body_drk"])
+    # plume trailing backwards (left side)
+    img.rect(1, 0, 4, 1, pal["cloth"])
+    img.rect(0, 1, 2, 1, pal["cloth_drk"])
+    img.rect(2, 0, 1, 1, pal["cloth_lit"])
     return img
 
 

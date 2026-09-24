@@ -47,10 +47,36 @@ func _process(delta : float) -> void:
 				" player=", player.global_position)
 	_handle_shop(delta)
 	if wave_manager != null and wave_manager.is_between_waves():
-		_wait_at_gate(delta)
+		if wave_manager.can_start_wave():
+			_wait_at_gate(delta)
+		else:
+			_collect_loot(delta)
 		return
 	_holding = false
 	_move(delta)
+
+## During the loot window / arena reshaping: chase the nearest pickup instead
+## of standing at the gate.
+func _collect_loot(delta : float) -> void:
+	_holding = false
+	var best : Node2D = null
+	var best_d : float = 1e9
+	for p in get_tree().get_nodes_in_group("pickup"):
+		var d : float = p.global_position.distance_squared_to(player.global_position)
+		if d < best_d:
+			best_d = d
+			best = p
+	if best == null:
+		_set_action("key_right", false)
+		_set_action("key_left", false)
+		return
+	var dx : float = best.global_position.x - player.global_position.x
+	_set_action("key_right", dx > 6.0)
+	_set_action("key_left", dx < -6.0)
+	_jump_timer -= delta
+	if _jump_timer <= 0.0 and absf(dx) < 200.0:
+		_jump_timer = 0.8
+		_tap("jump")
 
 # ------------------------------------------------------------------ behaviour
 func _aim() -> void:

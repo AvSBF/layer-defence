@@ -24,6 +24,7 @@ var _base_y : float = 0.0
 @onready var shape : CollisionShape2D = $shape
 
 func _ready() -> void:
+	add_to_group("pickup")
 	var info : Array = KIND_INFO.get(kind, KIND_INFO["coin"])
 	anim.sprite_frames = SheetAnim.build([
 		SheetAnim.sheet("res://Aseprites/Generated/" + str(info[0]), int(info[1]), int(info[2]), "play", float(info[3]), true),
@@ -100,6 +101,22 @@ func _collect() -> void:
 			Audio.play("heal")
 			FX.play("heal", global_position, {"scale": 1.1})
 	queue_free()
+
+## Called when the loot window closes: everything still on the ground is
+## collected automatically, so the player never misses a drop.
+static func vacuum_all() -> void:
+	var tree := Engine.get_main_loop() as SceneTree
+	if tree == null:
+		return
+	var found := tree.get_nodes_in_group("pickup")
+	if GameState.autotest and not found.is_empty():
+		print("[autotest] loot vacuum collected %d leftover pickups" % found.size())
+	for p in found:
+		if p.has_method("collect_now"):
+			p.call("collect_now")
+
+func collect_now() -> void:
+	_collect()
 
 static func spawn(parent : Node, pos : Vector2, kind : String, amount : int = 1) -> Pickup:
 	var scene : PackedScene = load("res://Resources/Prefabs/Pickup.tscn")

@@ -335,6 +335,76 @@ def pot_break_frames():
     return frames
 
 
+
+def chest_frames():
+    """Closed wooden chest with a gold band - 2 frame idle (sparkle pulse)."""
+    wood = C("#b06a34")
+    wood_lit = C("#d9924f")
+    wood_drk = C("#6f3c1c")
+    frames = []
+    for i in range(2):
+        img = Img(18, 17)
+        # body
+        img.rect(1, 7, 16, 9, wood)
+        img.rect(1, 7, 16, 1, wood_lit)
+        img.rect(1, 15, 16, 1, wood_drk)
+        img.rect(1, 7, 1, 9, wood_lit)
+        img.rect(16, 7, 1, 9, wood_drk)
+        # lid
+        img.rect(1, 2, 16, 5, wood_lit)
+        img.rect(1, 2, 16, 1, C("#f0b06a"))
+        img.rect(1, 6, 16, 1, wood_drk)
+        img.rect(1, 2, 1, 5, C("#f0b06a"))
+        # metal corners + bands
+        img.rect(4, 2, 2, 14, P["gold_drk"])
+        img.rect(12, 2, 2, 14, P["gold_drk"])
+        img.rect(4, 2, 2, 1, P["gold"])
+        img.rect(12, 2, 2, 1, P["gold"])
+        # lock
+        img.rect(8, 7, 3, 3, P["gold"])
+        img.rect(8, 7, 3, 1, P["gold_lit"])
+        img.set(9, 9, C("#6f3c1c"))
+        if i == 1:
+            img.set(0, 0, alpha(P["white"], 200))
+            img.set(17, 2, alpha(P["white"], 160))
+            img.set(2, 0, alpha(P["white"], 120))
+        img.outline(P["out"], diagonals=False)
+        frames.append(img)
+    return frames
+
+
+def chest_break_frames():
+    """Lid pops open, coins fountain out."""
+    frames = []
+    rnd = rng(23)
+    for i in range(6):
+        img = Img(34, 28)
+        # body sits on the ground, lid flies up
+        img.rect(6, 16, 22, 11, C("#b06a34"))
+        img.rect(6, 16, 22, 1, C("#d9924f"))
+        img.rect(6, 26, 22, 1, C("#6f3c1c"))
+        img.rect(9, 16, 2, 11, P["gold_drk"])
+        img.rect(23, 16, 2, 11, P["gold_drk"])
+        lid_y = 16 - i * 2 - max(0, i - 2)
+        if lid_y > -6:
+            img.rect(4, lid_y, 26, 5, C("#d9924f"))
+            img.rect(4, lid_y, 26, 1, C("#f0b06a"))
+            img.rect(6, lid_y, 2, 5, P["gold_drk"])
+            img.rect(26, lid_y, 2, 5, P["gold_drk"])
+        # coin fountain
+        for k in range(min(8, 2 + i)):
+            ang = -1.6 + rnd.uniform(-0.7, 0.7)
+            d = 3 + i * 3.4
+            cx = 17 + math.cos(ang) * d * 0.7
+            cy = 15 + math.sin(ang) * d
+            img.circle(cx, cy, 1.6, P["gold"])
+            img.set(cx, cy - 1, P["gold_lit"])
+        if i >= 4:
+            img = _fade(img, 255 - (i - 4) * 90)
+        frames.append(img)
+    return frames
+
+
 # ----------------------------------------------------------------- pickups
 def coin_frames():
     frames = []
@@ -555,6 +625,8 @@ def build():
     single(portal_base(), "Props/portal_base.png")
     sheet(wave_gate_frames(), "Props/wave_gate.png")
     single(pot(), "Props/pot.png")
+    sheet(chest_frames(), "Props/chest.png")
+    sheet(chest_break_frames(), "Props/chest_break.png")
     sheet(pot_break_frames(), "Props/pot_break.png")
     sheet(coin_frames(), "Pickups/coin.png")
     sheet(heart_frames(), "Pickups/heart.png")

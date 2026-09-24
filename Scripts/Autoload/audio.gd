@@ -9,7 +9,7 @@ const VOICES := 12
 var _players : Array[AudioStreamPlayer] = []
 var _next : int = 0
 var _cache : Dictionary = {}
-var _volume_db : float = -6.0
+var _volume_db : float = -8.0
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS

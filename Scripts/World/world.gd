@@ -39,6 +39,7 @@ func _ready() -> void:
 		wave_manager.wave_started.connect(_on_wave_started)
 		wave_manager.wave_cleared.connect(_on_wave_cleared)
 		wave_manager.enemies_changed.connect(_on_enemies_changed)
+		wave_manager.hint_changed.connect(_on_hint_changed)
 		wave_manager.shop_requested.connect(_on_shop_requested)
 	if shop != null:
 		shop.connect("visibility_changed", Callable(self, "_on_shop_visibility"))
@@ -108,17 +109,25 @@ func _on_start_requested() -> void:
 	if wave_manager != null:
 		wave_manager.start_run()
 
+func _on_hint_changed(text : String, visible : bool) -> void:
+	if hud != null:
+		hud.call("set_hint", text, visible)
+
+func _on_wave_cleared(_wave : int) -> void:
+	pass
+
+## Frame the sky portal while enemies are dropping, then settle back down.
+func _process(_delta : float) -> void:
+	if camera == null or wave_manager == null:
+		return
+	var spawning : bool = wave_manager.state == WaveManager.State.SPAWNING
+	camera.call("set_look_offset", -240.0 if spawning else -50.0)
+
 func _on_wave_started(wave : int, is_boss : bool, info : Dictionary) -> void:
 	if banner != null:
 		banner.call("show_wave", info)
-	if hud != null:
-		hud.call("show_gate_hint", false)
 	if camera != null:
 		camera.call("add_trauma", 0.25 if not is_boss else 0.6)
-
-func _on_wave_cleared(_wave : int) -> void:
-	if hud != null:
-		hud.call("show_gate_hint", true)
 
 func _on_enemies_changed(alive : int, total : int) -> void:
 	if hud != null:
@@ -127,8 +136,6 @@ func _on_enemies_changed(alive : int, total : int) -> void:
 func _on_shop_requested(_reason : String) -> void:
 	if shop == null or banner == null:
 		return
-	if hud != null:
-		hud.call("show_gate_hint", false)
 	if GameState.run_active and not shop.call("is_open"):
 		shop.call("open")
 
@@ -138,8 +145,8 @@ func _on_shop_visibility() -> void:
 	var open_now : bool = shop.visible
 	_dbg("shop visibility -> open=%s, between_waves=%s" % [str(open_now), str(wave_manager.is_between_waves())])
 	wave_manager.set_gate(not open_now and wave_manager.is_between_waves())
-	if not open_now and wave_manager.is_between_waves():
-		hud.call("show_gate_hint", true)
+	if not open_now and wave_manager.can_start_wave():
+		hud.call("set_hint", "STEP INTO THE GREEN GATE", true)
 
 func _dbg(msg : String) -> void:
 	if GameState.autotest:

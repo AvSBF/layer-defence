@@ -21,6 +21,9 @@ var _boss_bar : ProgressBar
 var _boss_fill : StyleBoxFlat
 var _notices : VBoxContainer
 var _gate_hint : HBoxContainer
+var _gate_panel : PanelContainer
+var _hint_label : Label
+var _hint_arrow : TextureRect
 var _heart_frames : Array[AtlasTexture] = []
 var _shown_coins : int = 0
 var _coin_tween : Tween
@@ -156,25 +159,31 @@ func _build() -> void:
 	_notices.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.add_child(_notices)
 
-	# --- gate hint
+	# --- status hint (loot window / arena shifting / green gate)
+	var hint_panel := PixelUI.panel()
+	hint_panel.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
+	hint_panel.position = Vector2(-230, -78)
+	hint_panel.custom_minimum_size = Vector2(460, 0)
+	hint_panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	hint_panel.visible = false
+	root.add_child(hint_panel)
+	_gate_panel = hint_panel
 	_gate_hint = HBoxContainer.new()
-	_gate_hint.set_anchors_preset(Control.PRESET_CENTER_BOTTOM)
-	_gate_hint.position = Vector2(-150, -80)
-	_gate_hint.add_theme_constant_override("separation", 8)
+	_gate_hint.alignment = BoxContainer.ALIGNMENT_CENTER
+	_gate_hint.add_theme_constant_override("separation", 10)
 	_gate_hint.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_gate_hint.visible = false
-	root.add_child(_gate_hint)
-	var arrow := TextureRect.new()
-	arrow.texture = load("res://Aseprites/Generated/UI/arrow.png")
-	arrow.custom_minimum_size = Vector2(24, 24)
-	arrow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-	arrow.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
-	_gate_hint.add_child(arrow)
-	var hint := PixelUI.label("STEP INTO THE GREEN GATE", PixelUI.SMALL, PixelUI.COL_GOOD)
-	_gate_hint.add_child(hint)
+	hint_panel.add_child(_gate_hint)
+	_hint_arrow = TextureRect.new()
+	_hint_arrow.texture = load("res://Aseprites/Generated/UI/arrow.png")
+	_hint_arrow.custom_minimum_size = Vector2(24, 24)
+	_hint_arrow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_hint_arrow.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+	_gate_hint.add_child(_hint_arrow)
+	_hint_label = PixelUI.label("STEP INTO THE GREEN GATE", PixelUI.SMALL, PixelUI.COL_GOOD)
+	_gate_hint.add_child(_hint_label)
 	var tween := create_tween().set_loops()
-	tween.tween_property(arrow, "position:y", 4.0, 0.5).set_trans(Tween.TRANS_SINE)
-	tween.tween_property(arrow, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(_hint_arrow, "position:y", 4.0, 0.5).set_trans(Tween.TRANS_SINE)
+	tween.tween_property(_hint_arrow, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_SINE)
 
 # -------------------------------------------------------------------- update
 func _refresh() -> void:
@@ -276,7 +285,7 @@ func _on_wave_changed(wave : int, is_boss : bool) -> void:
 	_wave_label.pivot_offset = _wave_label.size * 0.5
 	var t := create_tween()
 	t.tween_property(_wave_label, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK)
-	_gate_hint.visible = false
+	_gate_panel.visible = false
 
 func _on_boss_spawned(boss_name : String, max_hp : float) -> void:
 	_boss_max = max_hp
@@ -305,5 +314,27 @@ func set_enemies(alive : int, total : int) -> void:
 		return
 	_enemy_label.text = "ENEMIES LEFT  %d" % alive
 
+var _hint_text : String = ""
+
 func show_gate_hint(show_it : bool) -> void:
-	_gate_hint.visible = show_it
+	if _gate_panel == null:
+		return
+	if show_it and _hint_text == "":
+		return
+	_gate_panel.visible = show_it
+
+## One hint line shared by "collect the loot", "the arena is shifting" and
+## "step into the green gate" - the manager decides what it says.
+func set_hint(text : String, visible : bool = true) -> void:
+	if _gate_panel == null:
+		return
+	if _hint_text != text:
+		_hint_text = text
+		_hint_label.text = text
+		_hint_label.add_theme_color_override("font_color",
+			PixelUI.COL_GOOD if text.begins_with("STEP") else PixelUI.COL_GOLD)
+		_gate_panel.modulate.a = 0.0
+		var t := create_tween()
+		t.tween_property(_gate_panel, "modulate:a", 1.0, 0.18)
+	_gate_panel.visible = visible and text != ""
+	_gate_hint.visible = _gate_panel.visible

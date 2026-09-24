@@ -15,6 +15,8 @@ extends Camera2D
 @export var base_zoom : Vector2 = Vector2(2.0, 2.0)
 @export var follow_speed : float = 8.0
 @export var look_ahead : float = 48.0
+@export var look_offset_y : float = -50.0
+@export var look_offset_speed : float = 2.2
 
 var trauma : float = 0.0
 var target : Node2D
@@ -24,6 +26,7 @@ var _noise_roll : FastNoiseLite
 var _time : float = 0.0
 var _zoom_punch : float = 0.0
 var _shake_dir : Vector2 = Vector2.ZERO
+var _look_offset_target : float = 0.0
 
 func _ready() -> void:
 	zoom = base_zoom
@@ -37,6 +40,7 @@ func _ready() -> void:
 	_noise_roll = FastNoiseLite.new()
 	_noise_roll.seed = 90210
 	_noise_roll.frequency = noise_frequency * 0.5
+	_look_offset_target = look_offset_y
 	FX.shake_requested.connect(_on_shake_requested)
 	FX.zoom_requested.connect(_on_zoom_requested)
 	if target == null and target_path != NodePath():
@@ -52,6 +56,12 @@ func _on_shake_requested(amount : float, direction : Vector2) -> void:
 
 func _on_zoom_requested(amount : float) -> void:
 	_zoom_punch = minf(_zoom_punch + amount, 0.4)
+
+## Framing helper: the camera looks up while the portal is raining enemies.
+func set_look_offset(y : float, instant : bool = false) -> void:
+	_look_offset_target = y
+	if instant:
+		look_offset_y = y
 
 func add_trauma(amount : float, direction : Vector2 = Vector2.ZERO) -> void:
 	trauma = clampf(trauma + amount, 0.0, 1.0)
@@ -69,7 +79,8 @@ func _physics_process(delta : float) -> void:
 			look = (target as CharacterBody2D).velocity * 0.12
 			look.x = clampf(look.x, -look_ahead, look_ahead)
 			look.y = clampf(look.y, -look_ahead * 0.5, look_ahead * 0.5)
-		var want : Vector2 = target.global_position + look + Vector2(0, -40)
+		look_offset_y = lerpf(look_offset_y, _look_offset_target, clampf(look_offset_speed * delta, 0.0, 1.0))
+		var want : Vector2 = target.global_position + look + Vector2(0, look_offset_y)
 		global_position = global_position.lerp(want, clampf(follow_speed * delta, 0.0, 1.0))
 
 	var shake : float = trauma * trauma
