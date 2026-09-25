@@ -397,6 +397,8 @@ func take_damage(amount : float, knockback : Vector2 = Vector2.ZERO, _is_crit : 
 	var final_damage : float = maxf(1.0, round(amount * (1.0 - reduction)))
 	if GameState.autotest and not GameState.autotest_mortal:
 		final_damage = 0.0  # the demo bot needs to survive long enough to test bosses
+	if final_damage <= 0.0:
+		return  # never show a "0" damage popup (demo bot / fully warded hits)
 	GameState.set_health(GameState.health - int(final_damage))
 	invuln = 1.1
 	velocity += knockback

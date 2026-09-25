@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layer Defence — публикация на itch.io</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; background: #0a0912; color: #e0e0e0; line-height: 1.65; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px 90px; }
+    h1 { font-size: 2.2em; margin-bottom: 6px; background: linear-gradient(135deg, #fa5c5c, #ffd34d); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    h2 { font-size: 1.5em; margin: 42px 0 16px; color: #ffd34d; border-bottom: 2px solid #ffd34d33; padding-bottom: 8px; }
+    h3 { font-size: 1.1em; color: #7fe6cf; margin: 22px 0 10px; }
+    p { color: #b3acc6; margin-bottom: 14px; }
+    ul, ol { margin: 0 0 14px 22px; color: #b3acc6; }
+    li { margin-bottom: 6px; }
+    code { font-family: 'Cascadia Code', Consolas, monospace; background: #191527; padding: 2px 6px; border-radius: 4px; color: #ffd9a0; font-size: 0.9em; }
+    .subtitle { color: #6f6889; font-size: 1.05em; margin-bottom: 26px; }
+    .section { background: #12101d; border-radius: 12px; padding: 26px 30px; margin: 20px 0; border: 1px solid #221d33; }
+    .section.hot { border-color: #fa5c5c55; }
+    .section.teal { border-color: #7fe6cf44; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; margin: 16px 0; }
+    .card { background: #191527; border-radius: 10px; padding: 16px 18px; border: 1px solid #2a2340; }
+    .card-title { font-size: 1em; color: #ffd34d; margin-bottom: 6px; font-weight: 600; }
+    .card-desc { color: #948cab; font-size: 0.92em; }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 0.94em; }
+    th { text-align: left; padding: 9px 10px; background: #191527; color: #ffd34d; font-weight: 600; }
+    td { padding: 8px 10px; border-top: 1px solid #1c1830; color: #b3acc6; vertical-align: top; }
+    tr:hover td { background: #151222; }
+    .field { color: #ff8866; font-family: 'Cascadia Code', monospace; font-size: 0.88em; white-space: nowrap; }
+    .copy { background: #0c0a15; border: 1px solid #2a2340; border-left: 3px solid #7fe6cf; border-radius: 0 8px 8px 0; padding: 14px 18px; margin: 12px 0; white-space: pre-wrap; color: #d8d2ea; font-size: 0.94em; }
+    .copy.en { border-left-color: #ffd34d; }
+    .note { background: #1a1714; border-left: 3px solid #ffd34d; padding: 12px 16px; border-radius: 0 8px 8px 0; margin: 14px 0; font-size: 0.93em; color: #b3acc6; }
+    .note strong { color: #ffd34d; }
+    .warn { background: #1a1414; border-left: 3px solid #ff7a6f; }
+    .warn strong { color: #ff7a6f; }
+    .ok { background: #121a14; border-left: 3px solid #7fe6cf; }
+    .ok strong { color: #7fe6cf; }
+    .steps { counter-reset: step; list-style: none; padding: 0; }
+    .steps li { counter-increment: step; padding: 10px 0 10px 52px; position: relative; border-left: 2px solid #221d33; margin-left: 16px; }
+    .steps li::before { content: counter(step); position: absolute; left: -17px; top: 10px; width: 30px; height: 30px; background: #ffd34d; color: #16121f; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.85em; }
+    .tag { display: inline-block; margin: 3px 4px 3px 0; padding: 3px 9px; border-radius: 5px; background: #1e1a2e; border: 1px solid #2f2747; color: #cfc7e4; font-size: 0.85em; }
+    .tag.core { background: #2f2747; border-color: #ffd34d66; color: #ffd34d; }
+    .kbd { display: inline-block; min-width: 20px; text-align: center; padding: 1px 6px; border: 1px solid #3d3557; border-bottom-width: 2px; border-radius: 5px; background: #191527; font-family: 'Cascadia Code', monospace; font-size: 0.84em; color: #ffd34d; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+    .mono { font-family: 'Cascadia Code', Consolas, monospace; font-size: 0.88em; }
+    .footer { text-align: center; color: #3d3852; margin-top: 50px; font-size: 0.9em; }
+</style>
+</head>
+<body>
+<div class="container">
+
+    <h1>Публикация на itch.io</h1>
+    <p class="subtitle">Всё, что нужно вписать в страницу проекта: тексты, теги, настройки, файлы.<br>
+    Сборка уже сделана: <code>build/layer-defence-web.zip</code> (10.1 MB, single-threaded WebAssembly).</p>
+
+    <div class="section hot">
+        <h3 style="margin-top:0">Что уже готово в репозитории</h3>
+        <table>
+            <tr><th>Файл</th><th>Что это</th><th>Куда идёт</th></tr>
+            <tr><td class="mono">build/layer-defence-web.zip</td><td>готовая веб-сборка (9 файлов в корне архива)</td><td>в Uploads, с галочкой «played in the browser»</td></tr>
+            <tr><td class="mono">docs/itch/cover-630x500.png</td><td>обложка, нарисованная спрайтами и шрифтом игры</td><td>Cover image</td></tr>
+            <tr><td class="mono">docs/itch/screenshot-1-combat.png</td><td>бой: дуга замаха, индикатор радиуса, числа урона</td><td>Screenshots (1-й)</td></tr>
+            <tr><td class="mono">docs/itch/screenshot-2-portal.png</td><td>портал и падающие враги (крупный план неба)</td><td>Screenshots (2-й)</td></tr>
+            <tr><td class="mono">docs/itch/screenshot-3-boss.png</td><td>босс SLIME KING, полоса HP, шоквейв</td><td>Screenshots (3-й)</td></tr>
+            <tr><td class="mono">docs/itch/screenshot-4-shop.png</td><td>магазин апгрейдов с ценами</td><td>Screenshots (4-й)</td></tr>
+            <tr><td class="mono">export_presets.cfg</td><td>пресет экспорта «Web» (без threads, без VRAM-транскодеров)</td><td>для повторного экспорта</td></tr>
+        </table>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>1. Пошаговая загрузка</h2>
+    <div class="section">
+        <ol class="steps">
+            <li><b>Create new project</b> → заполнить Title / URL / Classification (см. таблицу ниже).</li>
+            <li><b>Edit game</b> → <b>Uploads</b> → перетащить <code>build/layer-defence-web.zip</code>.</li>
+            <li>После загрузки у файла поставить галочку <b>«This file will be played in the browser»</b>.</li>
+            <li>itch попросит выбрать <b>Kind of project</b> → <span class="field">HTML</span> (появится после галочки), и покажет <b>Embed options</b>.</li>
+            <li>В <b>Embed options</b>: viewport <code>1280 x 720</code>, включить <b>Fullscreen button</b>, выключить <b>Mobile friendly</b> и <b>Automatically start on page load</b>.</li>
+            <li><b>Cover image</b> → загрузить <code>docs/itch/cover-630x500.png</code>.</li>
+            <li><b>Screenshots</b> → загрузить 4 файла в порядке 1→4.</li>
+            <li><b>Genre</b>, <b>Tags</b>, <b>Release status</b>, <b>Pricing</b> → по таблицам ниже.</li>
+            <li><b>More information</b> (большое описание) → вставить готовый блок текста, при желании дополнить таблицей управления.</li>
+            <li><b>Save &amp; view page</b> → проверить, что игра запускается, затем <b>Publish</b> (или оставить Draft до финальной проверки).</li>
+        </ol>
+        <div class="warn note"><strong>Важно:</strong> все 9 файлов сборки должны лежать <em>в корне</em> zip-архива, а не внутри папки. Если зазиповать папку целиком, itch выдаст «The package is missing an index.html». Наш архив уже собран правильно — при пересборке используйте команду из раздела 5.</div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>2. Поля проекта: что вписать</h2>
+    <div class="section">
+        <table>
+            <tr><th>Поле itch.io</th><th>Значение</th><th>Комментарий</th></tr>
+            <tr><td>Title</td><td class="mono">Layer Defence</td><td>как в <code>project.godot</code></td></tr>
+            <tr><td>Project URL</td><td class="mono">layer-defence</td><td>итог: <code>ваш-ник.itch.io/layer-defence</code>; альтернативы: <code>layer-defense-pixel-roguelike</code></td></tr>
+            <tr><td>Short description or tagline</td><td>см. блок A ниже</td><td>до ~200 символов, попадает в карточку и поиск</td></tr>
+            <tr><td>Classification</td><td class="mono">Game</td><td>—</td></tr>
+            <tr><td>Kind of project</td><td class="mono">HTML</td><td>появляется после галочки «played in the browser»</td></tr>
+            <tr><td>Release status</td><td class="mono">Released</td><td>если планируете допиливать — <code>In development</code> и включить Devlog</td></tr>
+            <tr><td>Pricing</td><td class="mono">No payments</td><td>для «Name your own price» — указать $0 minimum и галочку donations</td></tr>
+            <tr><td>Genre</td><td class="mono">Action / Roguelike</td><td>можно выбрать <code>Action</code>, второй вариант — <code>Roguelike</code>, если поле поддерживает несколько</td></tr>
+            <tr><td>Platforms</td><td class="mono">HTML5</td><td>Windows/Linux/macOS отмечать не нужно, если не выкладываете нативные сборки</td></tr>
+            <tr><td>Input</td><td class="mono">Keyboard, Mouse</td><td>геймпад не поддерживается, тач — тоже</td></tr>
+            <tr><td>Players</td><td class="mono">Single player</td><td>—</td></tr>
+            <tr><td>Accessibility</td><td class="mono">—</td><td>опционально; честно указать «flashing lights» из-за вспышек и тряски камеры</td></tr>
+            <tr><td>Content warnings</td><td class="mono">No</td><td>насилие абстрактное, пиксельное; если хочется — отметить <code>Mild violence</code></td></tr>
+            <tr><td>Community</td><td class="mono">Comments on</td><td>«Discussion board» можно включить позже</td></tr>
+            <tr><td>Visibility &amp; access</td><td class="mono">Public</td><td>или <code>Restricted</code> с паролем для теста друзьями</td></tr>
+            <tr><td>Embed options ▸ Viewport size</td><td class="mono">1280 x 720</td><td>ровно как <code>viewport_width/height</code> в проекте</td></tr>
+            <tr><td>Embed options ▸ Fullscreen button</td><td class="mono">On</td><td>обязательно: игра про реакцию и мышь</td></tr>
+            <tr><td>Embed options ▸ Mobile friendly</td><td class="mono">Off</td><td>тач-управления нет, на телефоне играть невозможно</td></tr>
+            <tr><td>Embed options ▸ Automatically start on page load</td><td class="mono">Off</td><td>иначе звук и клавиатура могут не получить фокус</td></tr>
+            <tr><td>Embed options ▸ Prevent the page from scrolling</td><td class="mono">Off</td><td>—</td></tr>
+        </table>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>3. Готовые тексты</h2>
+    <div class="section teal">
+        <h3>A. Short description / tagline (EN)</h3>
+        <div class="copy en">A cozy pixel roguelike arena. Enemies rain from a shifting portal, pots and chests drop loot, and every 5th wave brings a boss. Spend coins on upgrades, survive the layers.</div>
+
+        <h3>A2. Короткое описание (RU, если страница на русском)</h3>
+        <div class="copy">Уютный пиксельный рогалик на арене: враги сыплются из перемещающегося портала, с неба падают горшки и сундуки, каждые 5 волн — босс. Собирай монеты, покупай апгрейды, продержись как можно дольше.</div>
+
+        <h3>B. Большое описание (EN) — в поле «More information»</h3>
+        <div class="copy en">ABOUT
+
+Layer Defence is a compact pixel-art roguelike arena. You are a knight with a sword, a portal is open above the arena, and the arena itself refuses to stay still.
+
+Every wave drops from the sky: slimes that split, bats that telegraph and swoop, skeleton bone-throwers, charging orcs, teleporting mages, exploding bombers, ghosts, spiders, imps and stone golems. Every 5th wave a boss climbs out — Slime King, Necromancer or Demon Lord — each with summons, slams and a second phase.
+
+Between waves the arena rebuilds itself: platforms slide, drop in and float away, and the portal reopens on the other side. Grab the loot, spend coins on upgrades (or on a whole new weapon), then step into the green gate to call the next wave.
+
+FEATURES
+- 10 enemy types + 3 multi-phase bosses + elite variants
+- 7 weapons: sword, twin dagger, spear, war hammer, bone scythe, hunter bow, arcane staff
+- 22 stackable upgrades and a rerollable shop between waves
+- Sky pots and treasure chests: extra hearts, coins and gems
+- Procedural arena layouts that reshape between rounds
+- Juice: trauma-based camera shake, hit-stop, damage numbers, crits, screen flashes
+- Every sprite, sound effect and even the font is generated by the project's own tooling
+- Runs in the browser: nothing to install, ~30 seconds to load, no account needed
+
+CONTROLS
+A / D - move          SPACE - jump (tap for a higher hop)
+SHIFT or J - dash     S - drop through a platform
+MOUSE - aim           LEFT CLICK - attack (hold to keep swinging)
+TAB or E - shop between waves     ESC - close the shop
+
+TIPS
+- Melee weapons show their exact reach and swing arc on the floor - use it.
+- Bats flash right before they dive. That's your window to dash.
+- During the loot window you have ~7 seconds to sweep the floor; leftovers are collected automatically when the shop opens.
+- Bosses enrage at half health.
+
+The build is a single-threaded WebAssembly export, so it runs on itch without any special browser settings. Keyboard and mouse required (no touch controls).</div>
+
+        <h3>B2. Большое описание (RU)</h3>
+        <div class="copy">Layer Defence — компактный пиксель-арт рогалик на арене. Ты — рыцарь с мечом, над ареной открыт портал, и сама арена не стоит на месте.
+
+Каждая волна сыплется с неба: слизни, которые делятся при смерти, летучие мыши, замирающие перед пикированием, скелеты-костоправы, разгоняющиеся орки, телепортирующиеся маги, бомберы, призраки, пауки, бесы и каменные големы. Каждая 5-я волна — босс (Король слизней, Некромант или Владыка демонов) с призывами, слэмами и второй фазой.
+
+Между волнами арена перестраивается: платформы переезжают, падают сверху и улетают, а портал открывается с другой стороны. Собери лут, потрать монеты на апгрейды или новое оружие — и шагни в зелёную зону, чтобы вызвать следующую волну.
+
+ОСОБЕННОСТИ
+- 10 видов врагов, 3 босса с фазами, элитные версии
+- 7 оружий: меч, парные кинжалы, копьё, молот, коса, лук, посох
+- 22 апгрейда и магазин с рероллом между волнами
+- Небесные горшки и сундуки: сердца, монеты, гемы
+- Процедурная арена, меняющаяся каждую вторую волну
+- Сочность: тряска камеры, хит-стоп, числа урона, криты, вспышки
+- Все спрайты, звуки и даже шрифт сгенерированы инструментами самого проекта
+- Работает в браузере: ничего ставить не нужно
+
+УПРАВЛЕНИЕ
+A/D — движение, ПРОБЕЛ — прыжок, SHIFT/J — рывок, S — провалиться сквозь платформу,
+МЫШЬ — прицел, ЛКМ — атака (можно удерживать), TAB/E — магазин, ESC — закрыть магазин
+
+Нужны клавиатура и мышь (тач не поддерживается).</div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>4. Теги и метаданные</h2>
+    <div class="section">
+        <p>itch разрешает до 10 тегов. Предлагаемый набор (сначала самые важные):</p>
+        <p>
+            <span class="tag core">roguelike</span>
+            <span class="tag core">pixel-art</span>
+            <span class="tag core">arena-shooter</span>
+            <span class="tag core">waves</span>
+            <span class="tag">action</span>
+            <span class="tag">survival</span>
+            <span class="tag">boss-battle</span>
+            <span class="tag">upgrades</span>
+            <span class="tag">2d</span>
+            <span class="tag">singleplayer</span>
+        </p>
+        <div class="note"><strong>Почему так:</strong> «roguelike» и «pixel-art» дают основной трафик из поиска itch, «waves» и «arena-shooter» точнее описывают жанр, «boss-battle» часто ищут отдельно. Тег «godot» ставить не обязательно — он не про игру, а про инструмент.</div>
+        <h3>Текст для анонса / devlog</h3>
+        <div class="copy en">First playable build is up! Layer Defence is a small pixel roguelike arena I built around three ideas: enemies rain from a moving portal, the arena rebuilds itself between waves, and every sprite/sound is generated by the project's own Python tooling. Feedback on difficulty and readability is very welcome.</div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>5. Сборка: как пересобрать и что внутри</h2>
+    <div class="section">
+        <h3>Команда экспорта</h3>
+        <div class="copy"># 1. импорт ресурсов (обязательно после правок арта)
+godot --headless --import --path .
+
+# 2. веб-сборка (использует export_presets.cfg, пресет "Web")
+godot --headless --path . --export-release "Web" "build/web/index.html"
+
+# 3. zip, где файлы лежат в КОРНЕ архива (иначе itch не найдёт index.html)
+# Windows PowerShell:
+Compress-Archive -Path "build/web/*" -DestinationPath "build/layer-defence-web.zip" -Force
+# или любым архиватором: выделить СОДЕРЖИМОЕ build/web и заархивировать</div>
+        <h3>Состав сборки (проверено на 4.7.1)</h3>
+        <table>
+            <tr><th>Файл</th><th>Размер</th><th>Назначение</th></tr>
+            <tr><td class="mono">index.html</td><td class="mono">8 KB</td><td>оболочка страницы</td></tr>
+            <tr><td class="mono">index.js</td><td class="mono">270 KB</td><td>загрузчик и связка с движком</td></tr>
+            <tr><td class="mono">index.wasm</td><td class="mono">37.7 MB</td><td>сам движок (сжимается до ~10 MB в zip)</td></tr>
+            <tr><td class="mono">index.pck</td><td class="mono">0.47 MB</td><td>вся игра: сцены, спрайты, звук, шрифт</td></tr>
+            <tr><td class="mono">index.audio.worklet.js</td><td class="mono">&lt;1 KB</td><td>звук вне главного потока</td></tr>
+            <tr><td class="mono">index.audio.position.worklet.js</td><td class="mono">&lt;1 KB</td><td>позиционный звук</td></tr>
+            <tr><td class="mono">index.icon.png / index.apple-touch-icon.png / index.png</td><td class="mono">~30 KB</td><td>иконки для вкладки и PWA</td></tr>
+        </table>
+        <p>Итого: <b>38.5 MB</b> распакованных, <b>10.1 MB</b> в zip, ~9 MB отдаётся по gzip — страница грузится на обычном соединении 5–15 секунд.</p>
+        <h3>Что настроено в пресете и почему</h3>
+        <table>
+            <tr><th>Опция</th><th>Значение</th><th>Зачем</th></tr>
+            <tr><td class="mono">variant/thread_support</td><td class="mono">false</td><td><b>Главное.</b> Без threads не нужны заголовки COOP/COEP, которых itch.io не отдаёт. Проверено: в <code>index.wasm</code> нет <code>pthread_create</code> и <code>SharedArrayBuffer</code>. Если включить threads — игра падает с ошибкой про SharedArrayBuffer.</td></tr>
+            <tr><td class="mono">vram_texture_compression/*</td><td class="mono">false</td><td>пиксель-арт хранится без сжатия (lossless), транскодеры Basis/ETC2 не нужны → сборка легче</td></tr>
+            <tr><td class="mono">html/canvas_resize_policy</td><td class="mono">2 (adaptive)</td><td>игра подстраивается под размер iframe на странице itch</td></tr>
+            <tr><td class="mono">html/focus_canvas_on_start</td><td class="mono">true</td><td>клавиатура сразу работает, без клика по канвасу</td></tr>
+            <tr><td class="mono">html/export_icon</td><td class="mono">true</td><td>иконка вкладки</td></tr>
+            <tr><td class="mono">progressive_web_app/enabled</td><td class="mono">false</td><td>PWA не нужна, меньше файлов</td></tr>
+        </table>
+        <div class="ok note"><strong>Проверка перед загрузкой:</strong> распакуйте zip в отдельную папку и откройте её локальным сервером — игра должна запуститься без консольных ошибок:</div>
+        <div class="copy"># из папки с распакованными файлами
+python -m http.server 8000
+# затем http://localhost:8000/ в Chrome/Firefox</div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>6. Если что-то пошло не так</h2>
+    <div class="section">
+        <table>
+            <tr><th>Симптом</th><th>Причина</th><th>Решение</th></tr>
+            <tr><td>itch пишет «The package is missing an index.html»</td><td>файлы зазипованы в папку</td><td>пересобрать zip так, чтобы <code>index.html</code> лежал в корне архива</td></tr>
+            <tr><td>Файл не играется в браузере, только скачивается</td><td>не отмечена галочка «This file will be played in the browser»</td><td>поставить галочку в Uploads</td></tr>
+            <tr><td>Чёрный экран, в консоли <code>SharedArrayBuffer is not defined</code></td><td>сборка с threads</td><td>экспортировать с <code>variant/thread_support=false</code> (в нашем пресете уже так)</td></tr>
+            <tr><td>Чёрный экран без ошибок</td><td>не дождались загрузки / кэш</td><td>подождать 10–20 секунд, обновить страницу с Ctrl+F5, проверить в другом браузере</td></tr>
+            <tr><td>Нет звука</td><td>политика автоплея браузеров</td><td>у нас «Automatically start on page load» выключен: звук включается после первого клика игрока — так и задумано</td></tr>
+            <tr><td>Мышь «уезжает» из канваса</td><td>курсор меняется на игровой (crosshair)</td><td>это нормально; в полноэкранном режиме (кнопка на itch) проблемы нет</td></tr>
+            <tr><td>Управление не реагирует</td><td>фокус не на канвасе</td><td>кликнуть один раз по игровому полю (плюс у нас <code>focus_canvas_on_start</code>)</td></tr>
+            <tr><td>Игра тормозит</td><td>слабый GPU / много врагов на 12-й волне</td><td>предупредить об этом в описании: «лучше всего работает в Chrome/Edge/Firefox последних версий»</td></tr>
+        </table>
+        <div class="warn note"><strong>Мобильные:</strong> сборка технически откроется на телефоне, но игра требует мышь и клавиатуру. Обязательно выключите <b>Mobile friendly</b>, иначе itch покажет её в мобильной ленте и получит злые отзывы.</div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>7. Чек-лист после публикации</h2>
+    <div class="section">
+        <ul>
+            <li>открыть страницу в анонимном окне и запустить игру: пройти волну 1, дождаться магазина;</li>
+            <li>проверить полный экран (кнопка itch) — курсор и клавиатура должны работать;</li>
+            <li>проверить, что игра не «съедает» прокрутку страницы (у нас <code>Prevent the page from scrolling = Off</code>);</li>
+            <li>посмотреть страницу с телефона — должна открываться заглушка/сообщение, а не сломанная игра;</li>
+            <li>заполнить «Credits»: вся графика, звук, шрифт и код сгенерированы в проекте; инструменты — Godot 4.7 и Python-скрипты из <code>Tools/artgen/</code>;</li>
+            <li>добавить ссылку на <code>docs/game-guide.html</code> (гайд по игре) в описание или в Devlog, если будете выкладывать его на GitHub Pages;</li>
+            <li>включить <b>Devlog</b>, если планируете обновления — itch подписывает на них игроков автоматически.</li>
+        </ul>
+        <div class="note"><strong>Готовые формулировки для Credits:</strong><br>
+        <code>Design, code, pixel art, sound &amp; font: generated inside the project (Godot 4.7 + custom Python tooling in Tools/artgen).</code><br>
+        <code>Engine: Godot Engine 4.7.1 (MIT).</code></div>
+    </div>
+
+    <!-- ==================================================== -->
+    <h2>8. Что стоит проверить перед публикацией в самой игре</h2>
+    <div class="section">
+        <ul>
+            <li>Баланс первых трёх волн — самый важный участок для отзывов: сейчас 6 HP, обычные враги бьют на 1, босс на 5-й волне имеет ~525 HP.</li>
+            <li>Если игра окажется слишком тяжёлой, самые быстрые ручки: <code>GameState.reset_run()</code> (<code>max_health = 6</code>), <code>WaveManager.elite_chance()</code> и <code>EnemyCatalog</code> (поле <code>weight</code> у врагов регулирует состав волн).</li>
+            <li>Проверьте производительность на 12+ волне: там 10–15 врагов и до 30 снарядов одновременно.</li>
+            <li>Звук на веб-сборке звучит тише, чем в редакторе (мастер −8 дБ) — при необходимости поднять в <code>audio.gd</code>.</li>
+        </ul>
+    </div>
+
+    <p class="footer">Layer Defence — памятка по публикации на itch.io. Сборка, обложка и скриншоты лежат в <code>build/</code> и <code>docs/itch/</code>.</p>
+
+</div>
+</body>
+</html>

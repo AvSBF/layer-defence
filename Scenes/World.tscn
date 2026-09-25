@@ -3,7 +3,6 @@
 [ext_resource type="Script" uid="uid://d0nuwbofmqgrx" path="res://Scripts/World/world.gd" id="1_world"]
 [ext_resource type="Script" uid="uid://chwi3qxskqk7u" path="res://Scripts/World/arena_camera.gd" id="2_cam"]
 [ext_resource type="PackedScene" path="res://Resources/Player/Player.tscn" id="3_player"]
-[ext_resource type="PackedScene" uid="uid://d2dssq6sj0iyr" path="res://Resources/Prefabs/Platform.tscn" id="4_platform"]
 [ext_resource type="Script" uid="uid://sijk4xpf5mi2" path="res://Scripts/World/portal.gd" id="5_portal"]
 [ext_resource type="Script" uid="uid://bm8l1t8n3rwgw" path="res://Scripts/World/wave_gate.gd" id="6_gate"]
 [ext_resource type="Script" uid="uid://dxgfrj3gj3xp5" path="res://Scripts/World/wave_manager.gd" id="7_wave"]
@@ -20,7 +19,7 @@
 [ext_resource type="Texture2D" uid="uid://q6em8lsbd85u" path="res://Aseprites/Generated/World/ground_fill.png" id="18_gfill"]
 [ext_resource type="Texture2D" uid="uid://bilaefeuidi76" path="res://Aseprites/Generated/World/pillar.png" id="19_pillar"]
 [ext_resource type="Texture2D" uid="uid://bp1h108usqctc" path="res://Aseprites/Generated/World/moon.png" id="20_moon"]
-[ext_resource type="Script" path="res://Scripts/World/platform_manager.gd" id="21_platforms"]
+[ext_resource type="Script" uid="uid://dd8yth2wd5h3m" path="res://Scripts/World/platform_manager.gd" id="21_platforms"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1400, 80)
@@ -148,9 +147,9 @@ target_path = NodePath("../Player")
 script = ExtResource("7_wave")
 portal_path = NodePath("../Portal")
 gate_path = NodePath("../WaveGate")
-platforms_path = NodePath("../Platforms")
 enemy_holder_path = NodePath("../Enemies")
 pot_holder_path = NodePath("../Pots")
+platforms_path = NodePath("../Platforms")
 
 [node name="Cursor" type="Node2D" parent="." unique_id=829705885]
 script = ExtResource("8_cursor")
