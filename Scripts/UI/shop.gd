@@ -81,9 +81,21 @@ func _build() -> void:
 	_continue_btn.pressed.connect(close)
 	footer.add_child(_continue_btn)
 
-	var hint := PixelUI.label("[TAB] SHOP  [ESC] CONTINUE", PixelUI.SMALL, PixelUI.COL_DIM)
-	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(hint)
+	var hint_row := HBoxContainer.new()
+	hint_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	hint_row.add_theme_constant_override("separation", 6)
+	col.add_child(hint_row)
+	hint_row.add_child(PixelUI.keycap("TAB"))
+	var hint1 := PixelUI.label("SHOP", PixelUI.SMALL, PixelUI.COL_DIM)
+	hint1.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hint_row.add_child(hint1)
+	var gap := Control.new()
+	gap.custom_minimum_size = Vector2(16, 0)
+	hint_row.add_child(gap)
+	hint_row.add_child(PixelUI.keycap("ESC"))
+	var hint2 := PixelUI.label("CONTINUE", PixelUI.SMALL, PixelUI.COL_DIM)
+	hint2.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hint_row.add_child(hint2)
 
 func _input(event : InputEvent) -> void:
 	if event.is_action_pressed("pause") and _is_open:

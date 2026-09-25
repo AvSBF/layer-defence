@@ -52,6 +52,29 @@ static func texture(rel : String) -> Texture2D:
 	_icon_cache[rel] = tex
 	return tex
 
+## Nine-patch cut out of a sprite-sheet frame (used for keycaps).
+static func nine_patch_frame(rel : String, frame : int, fw : int, fh : int, margin : int = 5) -> StyleBoxTexture:
+	var sb := StyleBoxTexture.new()
+	sb.texture = texture(rel)
+	sb.region_rect = Rect2(frame * fw, 0, fw, fh)
+	sb.texture_margin_left = margin
+	sb.texture_margin_right = margin
+	sb.texture_margin_top = margin
+	sb.texture_margin_bottom = margin
+	return sb
+
+## A keycap looking like the game's buttons: [ SPACE ] with the label inside.
+## `min_width` lets wide keys such as SPACE / SHIFT breathe.
+static func keycap(text : String) -> PanelContainer:
+	var p := PanelContainer.new()
+	p.add_theme_stylebox_override("panel", nine_patch_frame("UI/button.png", 0, 32, 16, 5))
+	var l := label(text, SMALL, COL_GOLD)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	p.add_child(l)
+	var w : float = maxf(30.0, float(text.length()) * 12.0 + 18.0)
+	p.custom_minimum_size = Vector2(w, 26.0)
+	return p
+
 static func nine_patch(rel : String, margin : int = 6) -> StyleBoxTexture:
 	var sb := StyleBoxTexture.new()
 	var tex := texture(rel)

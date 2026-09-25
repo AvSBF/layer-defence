@@ -29,8 +29,8 @@ func _build() -> void:
 
 	var centre := VBoxContainer.new()
 	centre.set_anchors_preset(Control.PRESET_CENTER)
-	centre.position = Vector2(-330, -190)
-	centre.custom_minimum_size = Vector2(660, 0)
+	centre.position = Vector2(-360, -210)
+	centre.custom_minimum_size = Vector2(720, 0)
 	centre.alignment = BoxContainer.ALIGNMENT_CENTER
 	centre.add_theme_constant_override("separation", 8)
 	_root.add_child(centre)
@@ -44,26 +44,20 @@ func _build() -> void:
 	centre.add_child(sub)
 
 	var spacer := Control.new()
-	spacer.custom_minimum_size = Vector2(0, 16)
+	spacer.custom_minimum_size = Vector2(0, 6)
 	centre.add_child(spacer)
 
-	var controls := [
-		"A / D  MOVE        SPACE  JUMP (TAP = HIGHER)",
-		"SHIFT  DASH        S  DROP THROUGH PLATFORM",
-		"MOUSE  AIM         LMB  ATTACK (HOLD TO SWING)",
-		"",
-		"SURVIVE THE WAVES. SMASH POTS. BUY UPGRADES.",
-		"STEP INTO THE GREEN GATE TO SUMMON THE NEXT WAVE.",
-		"EVERY 5TH WAVE IS A BOSS.",
-	]
-	for line in controls:
-		var l := PixelUI.label(line, PixelUI.SMALL, PixelUI.COL_TEXT if line != "" else PixelUI.COL_DIM)
-		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		centre.add_child(l)
-
-	var spacer2 := Control.new()
-	spacer2.custom_minimum_size = Vector2(0, 20)
-	centre.add_child(spacer2)
+	var legend_panel := PixelUI.panel()
+	centre.add_child(legend_panel)
+	var legend_margin := MarginContainer.new()
+	legend_margin.add_theme_constant_override("margin_left", 16)
+	legend_margin.add_theme_constant_override("margin_right", 16)
+	legend_margin.add_theme_constant_override("margin_top", 12)
+	legend_margin.add_theme_constant_override("margin_bottom", 12)
+	legend_panel.add_child(legend_margin)
+	var legend := ControlsPanel.new()
+	legend.set_title("SURVIVE THE WAVES. EVERY 5TH WAVE IS A BOSS.")
+	legend_margin.add_child(legend)
 
 	var start := PixelUI.label("CLICK TO DESCEND", PixelUI.LARGE, PixelUI.COL_GOOD)
 	start.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER

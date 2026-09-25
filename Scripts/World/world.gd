@@ -35,6 +35,8 @@ func _ready() -> void:
 		camera.call("set_target", player)
 	if title != null:
 		title.connect("start_requested", Callable(self, "_on_start_requested"))
+		if hud != null:
+			hud.call("set_hud_visible", false, false)   # the title card owns the screen
 	if wave_manager != null:
 		wave_manager.wave_started.connect(_on_wave_started)
 		wave_manager.wave_cleared.connect(_on_wave_cleared)
@@ -82,6 +84,11 @@ func _start_autotest() -> void:
 				shot_interval = maxf(0.1, float(arg.split("=")[1]))
 	if shot_interval > 0.0:
 		_screenshot_loop(shot_interval)
+	if OS.get_cmdline_user_args().has("--titleonly"):
+		# keep the title card on screen for store screenshots
+		return
+	if OS.get_cmdline_user_args().has("--controls"):
+		_open_controls_for_demo()
 	if OS.get_cmdline_user_args().has("--shopdemo"):
 		GameState.shop_demo = true
 		_open_shop_for_demo()
@@ -122,6 +129,12 @@ func _screenshot_loop(interval : float = 2.0) -> void:
 			print("[autotest] saved screenshot %d" % shot)
 		shot += 1
 
+func _open_controls_for_demo() -> void:
+	await get_tree().create_timer(1.2, true, false, true).timeout
+	var overlay := get_node_or_null("UI/Controls")
+	if overlay != null:
+		overlay.call("open")
+
 func _open_shop_for_demo() -> void:
 	await get_tree().create_timer(1.5, true, false, true).timeout
 	GameState.add_coins(120)
@@ -130,6 +143,8 @@ func _open_shop_for_demo() -> void:
 
 func _on_start_requested() -> void:
 	_dbg("run started")
+	if hud != null:
+		hud.call("set_hud_visible", true, true)
 	_run_active = true
 	Audio.play("wave_start", 0.0, -6.0)
 	GameState.start_run()

@@ -185,6 +185,19 @@ func _build() -> void:
 	tween.tween_property(_hint_arrow, "position:y", 4.0, 0.5).set_trans(Tween.TRANS_SINE)
 	tween.tween_property(_hint_arrow, "position:y", 0.0, 0.5).set_trans(Tween.TRANS_SINE)
 
+	# --- permanent controls hint in the corner
+	var help_box := HBoxContainer.new()
+	help_box.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
+	help_box.position = Vector2(-172, -46)
+	help_box.add_theme_constant_override("separation", 6)
+	help_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	help_box.modulate = Color(1, 1, 1, 0.75)
+	root.add_child(help_box)
+	help_box.add_child(PixelUI.keycap("H"))
+	var help_label := PixelUI.label("CONTROLS", PixelUI.SMALL, PixelUI.COL_DIM)
+	help_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	help_box.add_child(help_label)
+
 # -------------------------------------------------------------------- update
 func _refresh() -> void:
 	_sync_hearts()
@@ -315,6 +328,19 @@ func set_enemies(alive : int, total : int) -> void:
 	_enemy_label.text = "ENEMIES LEFT  %d" % alive
 
 var _hint_text : String = ""
+
+## The title card hides the HUD until the run actually starts.
+## (named set_hud_visible because CanvasLayer already owns set_visible)
+func set_hud_visible(state : bool, animated : bool = true) -> void:
+	if not animated:
+		visible = state
+		return
+	var target : float = 1.0 if state else 0.0
+	var t := create_tween()
+	t.tween_property(self, "modulate:a", target, 0.35)
+	if state:
+		visible = true
+	t.tween_callback(func(): visible = state)
 
 func show_gate_hint(show_it : bool) -> void:
 	if _gate_panel == null:

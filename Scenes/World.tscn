@@ -12,6 +12,7 @@
 [ext_resource type="PackedScene" path="res://Scenes/UI/WaveBanner.tscn" id="11_banner"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/GameOver.tscn" id="12_over"]
 [ext_resource type="PackedScene" path="res://Scenes/UI/Title.tscn" id="13_title"]
+[ext_resource type="PackedScene" path="res://Scenes/UI/Controls.tscn" id="22_controls"]
 [ext_resource type="Texture2D" uid="uid://d014hwcad6p2w" path="res://Aseprites/Generated/World/sky.png" id="14_sky"]
 [ext_resource type="Texture2D" uid="uid://br01r5i11egmk" path="res://Aseprites/Generated/World/hills_far.png" id="15_far"]
 [ext_resource type="Texture2D" uid="uid://drdb7sshk50ha" path="res://Aseprites/Generated/World/hills_mid.png" id="16_mid"]
@@ -165,3 +166,5 @@ script = ExtResource("8_cursor")
 [node name="GameOver" parent="UI" unique_id=453126299 instance=ExtResource("12_over")]
 
 [node name="Title" parent="UI" unique_id=910102786 instance=ExtResource("13_title")]
+
+[node name="Controls" parent="UI" unique_id=771204533 instance=ExtResource("22_controls")]
