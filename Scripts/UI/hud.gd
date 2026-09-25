@@ -19,6 +19,7 @@ var _boss_root : VBoxContainer
 var _boss_name : Label
 var _boss_bar : ProgressBar
 var _boss_fill : StyleBoxFlat
+var _hud_root : Control
 var _notices : VBoxContainer
 var _gate_hint : HBoxContainer
 var _gate_panel : PanelContainer
@@ -52,6 +53,7 @@ func _build() -> void:
 	root.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	root.theme = PixelUI.theme()
 	add_child(root)
+	_hud_root = root
 
 	# --- top left: hearts / weapon / dash
 	var left := VBoxContainer.new()
@@ -332,15 +334,21 @@ var _hint_text : String = ""
 ## The title card hides the HUD until the run actually starts.
 ## (named set_hud_visible because CanvasLayer already owns set_visible)
 func set_hud_visible(state : bool, animated : bool = true) -> void:
-	if not animated:
+	if _hud_root == null:
+		_hud_root = get_child(0) as Control
+	if _hud_root == null:
 		visible = state
 		return
+	if not animated:
+		visible = state
+		_hud_root.modulate.a = 1.0 if state else 0.0
+		return
+	visible = true
 	var target : float = 1.0 if state else 0.0
 	var t := create_tween()
-	t.tween_property(self, "modulate:a", target, 0.35)
-	if state:
-		visible = true
-	t.tween_callback(func(): visible = state)
+	t.tween_property(_hud_root, "modulate:a", target, 0.3)
+	if not state:
+		t.tween_callback(func(): visible = false)
 
 func show_gate_hint(show_it : bool) -> void:
 	if _gate_panel == null:

@@ -10,16 +10,25 @@ config_version=5
 
 [application]
 
-config/name="Layer_Defence"
+config/name="Layer Defence"
+config/description="A compact pixel-art roguelike arena by AvSGames. Enemies rain from a shifting portal, the arena rebuilds itself between waves, and every 5th wave brings a boss."
+config/version="1.0.0"
 run/main_scene="uid://bk28shcxsyg0v"
 config/features=PackedStringArray("4.7", "Forward Plus")
-config/icon="res://icon.svg"
+config/icon="res://Aseprites/Generated/Branding/icon_512.png"
 
 [autoload]
 
 GameState="*res://Scripts/Autoload/game_state.gd"
 Audio="*res://Scripts/Autoload/audio.gd"
 FX="*res://Scripts/Autoload/fx.gd"
+
+[boot_splash]
+
+bg_color=Color(0.043137, 0.027451, 0.078431, 1)
+image="res://Aseprites/Generated/Branding/splash_1280x720.png"
+show_image=true
+use_filter=false
 
 [display]
 

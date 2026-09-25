@@ -65,7 +65,8 @@
             <tr><td class="mono">docs/itch/screenshot-2-portal.png</td><td>портал и падающие враги (крупный план неба)</td><td>Screenshots (2-й)</td></tr>
             <tr><td class="mono">docs/itch/screenshot-3-boss.png</td><td>босс SLIME KING, полоса HP, шоквейв</td><td>Screenshots (3-й)</td></tr>
             <tr><td class="mono">docs/itch/screenshot-4-shop.png</td><td>магазин апгрейдов с ценами</td><td>Screenshots (4-й)</td></tr>
-            <tr><td class="mono">export_presets.cfg</td><td>пресет экспорта «Web» (без threads, без VRAM-транскодеров)</td><td>для повторного экспорта</td></tr>
+            <tr><td class="mono">export_presets.cfg</td><td>пресеты «Web» (без threads) и «Windows Desktop» (метаданные AvSGames)</td><td>для повторного экспорта</td></tr>
+            <tr><td class="mono">build/layer-defence-windows-x86_64.zip</td><td>Windows-сборка (один exe, 36.7 MB)</td><td>опционально — вторым файлом в Uploads</td></tr>
         </table>
     </div>
 
@@ -248,6 +249,41 @@ python -m http.server 8000
     </div>
 
     <!-- ==================================================== -->
+    <h2>5a. Лицензии и метаданные (что уже прописано)</h2>
+    <div class="section teal">
+        <p>Всё юридическое лежит в репозитории — на странице itch достаточно сослаться на лицензии одной строкой.</p>
+        <table>
+            <tr><th>Файл</th><th>Что внутри</th></tr>
+            <tr><td class="mono">LICENSE</td><td>MIT для кода: <code>Copyright (c) 2026 AvSGames</code></td></tr>
+            <tr><td class="mono">LICENSE-ASSETS.md</td><td>CC BY 4.0 для спрайтов, звуков, шрифта, брендинга и store-картинок + готовая строка атрибуции</td></tr>
+            <tr><td class="mono">THIRD-PARTY.md</td><td>Godot Engine 4.7.1 (MIT) и его встроенные зависимости (FreeType, HarfBuzz, ICU, libpng, zlib, mbedTLS, Basis, ThorVG…), build-time инструменты (Python, Pillow)</td></tr>
+            <tr><td class="mono">README.md</td><td>обзор проекта, управление, команды сборки, сводка лицензий</td></tr>
+        </table>
+        <h3>Что прописано в самой сборке</h3>
+        <table>
+            <tr><th>Где</th><th>Значение</th></tr>
+            <tr><td><code>project.godot</code> ▸ Name</td><td class="mono">Layer Defence</td></tr>
+            <tr><td><code>project.godot</code> ▸ Version</td><td class="mono">1.0.0</td></tr>
+            <tr><td><code>project.godot</code> ▸ Description</td><td>описание игры (видно в менеджерах проектов)</td></tr>
+            <tr><td><code>project.godot</code> ▸ Icon</td><td class="mono">res://Aseprites/Generated/Branding/icon_512.png (пиксельный шлем на фоне портала, сгенерирован кодом)</td></tr>
+            <tr><td>Boot splash</td><td>логотип + «BY AVSGAMES» + версия, <code>use_filter=false</code> (без размытия)</td></tr>
+            <tr><td>Windows exe ▸ CompanyName</td><td class="mono">AvSGames</td></tr>
+            <tr><td>Windows exe ▸ ProductName</td><td class="mono">Layer Defence</td></tr>
+            <tr><td>Windows exe ▸ LegalCopyright</td><td class="mono">Copyright (c) 2026 AvSGames. Code: MIT. Assets: CC BY 4.0.</td></tr>
+            <tr><td>Windows exe ▸ FileVersion</td><td class="mono">1.0.0.0</td></tr>
+            <tr><td>Web ▸ <code>&lt;head&gt;</code></td><td><code>&lt;meta name="author" content="AvSGames"&gt;</code>, description, theme-color и комментарий с лицензиями</td></tr>
+        </table>
+        <h3>Вторая сборка: Windows</h3>
+        <p>Если хотите выложить не только браузерную версию, прикрепите вторым файлом <code>build/layer-defence-windows-x86_64.zip</code> (36.7 MB, один exe со встроенным pck, метаданные AvSGames внутри). На странице проекта:</p>
+        <ul>
+            <li><b>Platforms</b> → добавить <span class="mono">Windows</span>;</li>
+            <li><b>Kind of project</b> для этого файла остаётся <span class="mono">Downloadable</span> (галочку «played in the browser» ставить <b>не надо</b>);</li>
+            <li>в <b>Embed options</b> ничего не меняется — они относятся только к HTML-файлу.</li>
+        </ul>
+        <div class="ok note"><strong>Проверка exe:</strong> правый клик → Свойства → Подробно: там должны быть CompanyName <code>AvSGames</code>, ProductName <code>Layer Defence</code> и копирайт.</div>
+    </div>
+
+    <!-- ==================================================== -->
     <h2>6. Если что-то пошло не так</h2>
     <div class="section">
         <table>
@@ -272,13 +308,14 @@ python -m http.server 8000
             <li>проверить полный экран (кнопка itch) — курсор и клавиатура должны работать;</li>
             <li>проверить, что игра не «съедает» прокрутку страницы (у нас <code>Prevent the page from scrolling = Off</code>);</li>
             <li>посмотреть страницу с телефона — должна открываться заглушка/сообщение, а не сломанная игра;</li>
-            <li>заполнить «Credits»: вся графика, звук, шрифт и код сгенерированы в проекте; инструменты — Godot 4.7 и Python-скрипты из <code>Tools/artgen/</code>;</li>
+            <li>заполнить «Credits»: <b>AvSGames</b> — код, графика, звук и шрифт (сгенерированы в самом проекте); движок — Godot 4.7.1; лицензии — MIT (код) и CC BY 4.0 (ассеты);</li>
             <li>добавить ссылку на <code>docs/game-guide.html</code> (гайд по игре) в описание или в Devlog, если будете выкладывать его на GitHub Pages;</li>
             <li>включить <b>Devlog</b>, если планируете обновления — itch подписывает на них игроков автоматически.</li>
         </ul>
         <div class="note"><strong>Готовые формулировки для Credits:</strong><br>
-        <code>Design, code, pixel art, sound &amp; font: generated inside the project (Godot 4.7 + custom Python tooling in Tools/artgen).</code><br>
-        <code>Engine: Godot Engine 4.7.1 (MIT).</code></div>
+        <code>Layer Defence by AvSGames — design, code, pixel art, sound effects and bitmap font (generated in-house with the project's own Python tooling).</code><br>
+        <code>Engine: Godot Engine 4.7.1 (MIT).</code><br>
+        <code>Code licensed under MIT, assets under CC BY 4.0.</code></div>
     </div>
 
     <!-- ==================================================== -->
