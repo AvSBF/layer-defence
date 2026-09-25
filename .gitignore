@@ -4,3 +4,7 @@
 
 # export artifacts (uploaded to itch.io manually)
 /build/
+
+# python build tooling cache
+__pycache__/
+*.pyc
